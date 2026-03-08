@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Faire un Don — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li><li><a href="chatons.html">Chatons</a></li>
+      <li><a href="adoption.html">Adopter</a></li><li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary active">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="don-page">
+  <div class="scrapbook-deco" style="position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;">
+    <span style="position:absolute;top:15%;left:2%;font-size:3rem;opacity:0.08;">🐾</span>
+    <span style="position:absolute;bottom:20%;right:2%;font-size:3rem;opacity:0.08;">❤️</span>
+  </div>
+
+  <div class="don-page-header">
+    <h1>💛 Soutenez les Minouches</h1>
+    <p style="color:var(--brown-soft);font-size:1.05rem;margin-top:0.5rem;">100% des dons sont reversés directement aux soins des chats. Merci pour eux !</p>
+  </div>
+
+  <!-- Don cards -->
+  <div class="don-cards" style="margin-bottom:2.5rem;">
+    <div class="don-card">
+      <div class="don-emoji">🍽️</div>
+      <h3>Un repas</h3>
+      <p class="don-amount">5€</p>
+      <p>Offrez un repas complet à un chat secouru</p>
+      <button class="btn-primary don-btn" onclick="setAmount(5)">Choisir 5€</button>
+    </div>
+    <div class="don-card don-card-featured">
+      <div class="don-badge">❤️ Populaire</div>
+      <div class="don-emoji">💉</div>
+      <h3>Santé & Soins</h3>
+      <p class="don-amount">15€</p>
+      <p>Vaccination et soins de base pour un minouche</p>
+      <button class="btn-primary don-btn" onclick="setAmount(15)">Choisir 15€</button>
+    </div>
+    <div class="don-card">
+      <div class="don-emoji">🏠</div>
+      <h3>Abri & Câlins</h3>
+      <p class="don-amount">30€</p>
+      <p>Participez au financement d'un abri temporaire</p>
+      <button class="btn-primary don-btn" onclick="setAmount(30)">Choisir 30€</button>
+    </div>
+  </div>
+
+  <!-- Yapla Integration -->
+  <div class="yapla-embed-container">
+    <h2 style="text-align:center;font-size:1.6rem;margin-bottom:0.5rem;color:var(--brown);">🎯 Choisissez votre montant</h2>
+    <p style="text-align:center;color:var(--brown-soft);margin-bottom:1.5rem;font-size:0.95rem;">Reçu fiscal automatique envoyé par email</p>
+
+    <div class="amount-buttons">
+      <button class="amount-btn" onclick="setAmount(5)" id="btn5">5€</button>
+      <button class="amount-btn" onclick="setAmount(10)" id="btn10">10€</button>
+      <button class="amount-btn active" onclick="setAmount(15)" id="btn15">15€</button>
+      <button class="amount-btn" onclick="setAmount(20)" id="btn20">20€</button>
+      <button class="amount-btn" onclick="setAmount(30)" id="btn30">30€</button>
+      <button class="amount-btn" onclick="setAmount(50)" id="btn50">50€</button>
+    </div>
+
+    <div class="amount-custom">
+      <label style="font-weight:700;color:var(--brown);display:block;margin-bottom:0.5rem;">Ou entrez votre montant :</label>
+      <div style="display:flex;align-items:center;gap:0.5rem;justify-content:center;">
+        <input type="number" id="customAmount" class="form-control" style="width:140px;text-align:center;font-size:1.3rem;font-family:var(--font-display);" placeholder="€" min="1" oninput="customAmountChange()"/>
+        <span style="font-size:1.5rem;font-family:var(--font-display);font-weight:700;color:var(--brown-soft);">€</span>
+      </div>
+    </div>
+
+    <div id="selectedAmount" style="text-align:center;font-family:var(--font-display);font-size:1.1rem;color:var(--brown-soft);margin-bottom:1.5rem;">
+      Montant sélectionné : <strong id="amountDisplay" style="color:var(--coral);font-size:1.4rem;">15€</strong>
+    </div>
+
+    <!-- 
+      ================================================
+      INTÉGRATION YAPLA
+      ================================================
+      Pour connecter Yapla :
+      1. Créez un formulaire de don sur votre espace Yapla
+      2. Copiez le code d'intégration fourni par Yapla
+      3. Remplacez le bloc ci-dessous par votre iframe/widget Yapla
+      
+      Exemple d'intégration Yapla (à remplacer par vos vraies infos) :
+      <iframe src="https://www.yapla.com/fr/form-embed/VOTRE_ID_FORMULAIRE?amount=15&currency=EUR"
+              width="100%" height="600" frameborder="0" scrolling="no"
+              style="border:none;border-radius:1rem;">
+      </iframe>
+      ================================================
+    -->
+
+    <div id="yaplaWidget" style="background:var(--cream);border-radius:var(--radius-lg);padding:2rem;border:2px dashed var(--cream-dark);">
+      <!-- Placeholder — remplacez par l'embed Yapla réel -->
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <p style="font-size:0.85rem;color:var(--brown-soft);background:var(--cream-dark);padding:0.75rem 1.25rem;border-radius:0.75rem;display:inline-block;">
+          🔧 <strong>Configuration requise :</strong> Collez votre iframe Yapla ici pour activer les paiements réels
+        </p>
+      </div>
+      
+      <form onsubmit="handleDon(event)">
+        <div class="form-row">
+          <div class="form-group"><label>Prénom *</label><input type="text" class="form-control" name="firstName" placeholder="Marie" required/></div>
+          <div class="form-group"><label>Nom *</label><input type="text" class="form-control" name="lastName" placeholder="Dupont" required/></div>
+        </div>
+        <div class="form-group"><label>Email * (pour reçu fiscal)</label><input type="email" class="form-control" name="email" placeholder="marie@email.fr" required/></div>
+        <div style="margin-top:1rem;text-align:center;">
+          <a href="https://www.yapla.com" target="_blank" rel="noopener" class="btn-primary btn-large" id="donBtn"
+             style="display:inline-flex;gap:0.75rem;align-items:center;">
+            💛 Donner <strong id="btnAmountDisplay">15€</strong> via Yapla →
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <div class="yapla-note">
+      🔒 Paiement sécurisé via Yapla · Reçu fiscal automatique · Association loi 1901
+    </div>
+  </div>
+
+  <!-- HelloAsso alternative -->
+  <div style="background:white;border:2px solid var(--cream-dark);border-radius:var(--radius-xl);padding:1.75rem 2rem;margin-top:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;box-shadow:var(--shadow);">
+    <div style="font-size:2.5rem;">🤝</div>
+    <div style="flex:1;">
+      <strong style="font-family:var(--font-display);font-size:1.1rem;display:block;margin-bottom:0.25rem;">Parrainages d'Entreprises</strong>
+      <p style="color:var(--brown-soft);font-size:0.9rem;">Vous représentez une entreprise et souhaitez nous soutenir ? Contactez-nous pour mettre en place un partenariat.</p>
+    </div>
+    <a href="contact.html" class="btn-outline">Nous contacter →</a>
+  </div>
+
+  <!-- Impact -->
+  <div style="margin-top:3rem;">
+    <div class="section-header">
+      <div class="section-tape section-tape-left"></div>
+      <h2 class="section-title">L'impact de vos dons 🌟</h2>
+      <div class="section-tape section-tape-right"></div>
+    </div>
+    <div class="steps-grid" style="max-width:100%;margin-top:2rem;">
+      <div class="step-card"><div class="step-icon">🍽️</div><h3>Alimentation</h3><p>Nourriture de qualité, adaptée à chaque âge et état de santé.</p></div>
+      <div class="step-card"><div class="step-icon">💉</div><h3>Soins vétérinaires</h3><p>Vaccins, stérilisations, traitements, urgences médicales.</p></div>
+      <div class="step-card"><div class="step-icon">🏠</div><h3>Hébergement</h3><p>Familles d'accueil, équipement, literies, jouets.</p></div>
+      <div class="step-card"><div class="step-icon">📣</div><h3>Communication</h3><p>Sensibilisation, actions de terrain, sauvetages.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div><div class="footer-sub">Association loi 1901</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><h4>Navigation</h4><a href="chats.html">Chats</a><a href="chatons.html">Chatons</a><a href="adoption.html">Adopter</a></div>
+      <div class="footer-col"><h4>Association</h4><a href="a-propos.html">À propos</a><a href="contact.html">Contact</a><a href="mentions-legales.html">Mentions légales</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span><span>|</span><a href="mentions-legales.html">Mentions légales</a></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+let selectedAmount = 15;
+
+// Set amount from URL
+const urlParams = new URLSearchParams(window.location.search);
+const urlAmount = urlParams.get('amount');
+if (urlAmount) selectedAmount = parseInt(urlAmount);
+
+function setAmount(val) {
+  selectedAmount = val;
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('btn' + val);
+  if (btn) btn.classList.add('active');
+  document.getElementById('customAmount').value = '';
+  document.getElementById('amountDisplay').textContent = val + '€';
+  document.getElementById('btnAmountDisplay').textContent = val + '€';
+  updateDonBtn(val);
+}
+
+function customAmountChange() {
+  const val = parseInt(document.getElementById('customAmount').value);
+  if (!val || val < 1) return;
+  selectedAmount = val;
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('amountDisplay').textContent = val + '€';
+  document.getElementById('btnAmountDisplay').textContent = val + '€';
+  updateDonBtn(val);
+}
+
+function updateDonBtn(val) {
+  // Update Yapla link with amount
+  const btn = document.getElementById('donBtn');
+  if (btn) {
+    // Remplacez YOUR_YAPLA_ORG par votre identifiant Yapla
+    btn.href = `https://www.yapla.com/fr/YOUR_YAPLA_ORG/don?amount=${val}`;
+  }
+}
+
+function handleDon(e) {
+  e.preventDefault();
+  // Ouvrir la page Yapla avec le montant
+  const amount = selectedAmount || 15;
+  window.open(`https://www.yapla.com/fr/YOUR_YAPLA_ORG/don?amount=${amount}`, '_blank');
+}
+
+// Init
+setAmount(selectedAmount);
+</script>
+</body>
+</html>

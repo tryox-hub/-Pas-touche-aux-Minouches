@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginWrap" class="admin-login">
+  <div class="admin-login-card">
+    <div style="font-size:3rem;margin-bottom:0.5rem;">🐾</div>
+    <h1>Espace Admin</h1>
+    <p>Pas touche aux Minouches</p>
+    <form onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" class="form-control" id="adminPwd" placeholder="Mot de passe admin" required autofocus/>
+      </div>
+      <div id="loginError" style="display:none;color:#e74c3c;font-size:0.85rem;margin-bottom:0.75rem;text-align:center;">Mot de passe incorrect</div>
+      <button type="submit" class="btn-primary" style="width:100%;">Connexion 🔓</button>
+    </form>
+    <p style="font-size:0.8rem;color:var(--brown-soft);margin-top:1.25rem;text-align:center;">
+      Mot de passe par défaut : <code style="background:var(--cream-dark);padding:2px 6px;border-radius:4px;">Minouches2024!</code>
+    </p>
+    <a href="index.html" style="display:block;text-align:center;margin-top:1rem;font-size:0.9rem;color:var(--brown-soft);">← Retour au site</a>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin-layout" style="display:none;">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-top">
+      <span class="admin-logo-icon">🐱</span>
+      <h2>Pas touche aux Minouches</h2>
+      <p>Admin Portal</p>
+    </div>
+    <nav class="admin-nav">
+      <button class="admin-nav-item active" onclick="showSection('cats')" id="navCats">
+        <span class="nav-icon">🐾</span> Chats & Chatons
+      </button>
+      <button class="admin-nav-item" onclick="showSection('applications')" id="navApps">
+        <span class="nav-icon">📋</span> Demandes d'adoption
+      </button>
+      <button class="admin-nav-item" onclick="showSection('stats')" id="navStats">
+        <span class="nav-icon">📊</span> Statistiques
+      </button>
+      <button class="admin-nav-item" onclick="showSection('settings')" id="navSettings">
+        <span class="nav-icon">⚙️</span> Paramètres
+      </button>
+    </nav>
+    <div style="padding:1.5rem;border-top:1px solid var(--cream-dark);">
+      <a href="index.html" style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--brown-soft);font-weight:600;margin-bottom:0.75rem;">🌐 Voir le site public</a>
+      <button onclick="doLogout()" style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--brown-soft);font-weight:600;background:none;border:none;cursor:pointer;width:100%;text-align:left;">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <header class="admin-header">
+      <h2 id="adminTitle">🐾 Chats & Chatons</h2>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <div id="headerActions"></div>
+        <div style="font-size:0.85rem;color:var(--brown-soft);" id="currentDate"></div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ======================== CATS SECTION ======================== -->
+      <div id="sectionCats">
+        <!-- Stats bar -->
+        <div class="admin-stats-grid" id="adminStatsBar"></div>
+
+        <!-- Search + add -->
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;">
+          <input type="text" class="form-control" id="catSearch" placeholder="🔍 Rechercher un minouche..." style="flex:1;min-width:200px;" oninput="renderCatsTable()"/>
+          <select class="form-control" id="catFilter" onchange="renderCatsTable()" style="width:auto;">
+            <option value="all">Tous les statuts</option>
+            <option value="available">✅ Disponibles</option>
+            <option value="pending">⏳ En cours</option>
+            <option value="adopted">🏠 Adoptés</option>
+          </select>
+          <button class="btn-primary" onclick="openAddCat()">➕ Ajouter un minouche</button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 id="catsTableTitle">Tous les résidents</h3>
+            <div style="font-size:0.85rem;color:var(--brown-soft);" id="catsCount"></div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="catsTable">
+              <thead>
+                <tr>
+                  <th>Minouche</th>
+                  <th>Race</th>
+                  <th>Âge</th>
+                  <th>Sexe</th>
+                  <th>Type</th>
+                  <th>Statut</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="catsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== APPLICATIONS SECTION ======================== -->
+      <div id="sectionApplications" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Demandes d'adoption</h3>
+            <div style="font-size:0.85rem;color:var(--brown-soft);" id="appsCount"></div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Demandeur</th>
+                  <th>Email</th>
+                  <th>Minouche souhaité</th>
+                  <th>Date</th>
+                  <th>Statut</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="appsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== STATS SECTION ======================== -->
+      <div id="sectionStats" style="display:none;">
+        <div class="admin-card" style="padding:2rem;">
+          <h3 style="margin-bottom:1.5rem;">📊 Mettre à jour les statistiques du site</h3>
+          <form onsubmit="saveStats(event)">
+            <div class="form-row">
+              <div class="form-group"><label>Total adoptions 🏠</label><input type="number" class="form-control" name="totalAdopted" id="statAdoptedInput" min="0"/></div>
+              <div class="form-group"><label>Total chats sauvés 🐱</label><input type="number" class="form-control" name="totalRescued" id="statRescuedInput" min="0"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Années d'activité 📅</label><input type="number" class="form-control" name="yearsActive" id="statYearsInput" min="1"/></div>
+            </div>
+            <button type="submit" class="btn-primary">💾 Sauvegarder les stats</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ======================== SETTINGS SECTION ======================== -->
+      <div id="sectionSettings" style="display:none;">
+        <div class="admin-card" style="padding:2rem;">
+          <h3 style="margin-bottom:1.5rem;">⚙️ Paramètres</h3>
+          
+          <div class="form-section" data-tape="🔐 SÉCURITÉ" style="background:var(--cream);margin-bottom:1.5rem;">
+            <h3>Changer le mot de passe admin</h3>
+            <form onsubmit="changePwd(event)">
+              <div class="form-group"><label>Nouveau mot de passe *</label><input type="password" class="form-control" id="newPwd1" required minlength="8" placeholder="Min. 8 caractères"/></div>
+              <div class="form-group"><label>Confirmer *</label><input type="password" class="form-control" id="newPwd2" required/></div>
+              <button type="submit" class="btn-primary">🔒 Changer le mot de passe</button>
+            </form>
+          </div>
+
+          <div class="form-section" data-tape="📦 DONNÉES" style="background:var(--cream);">
+            <h3 style="color:#e74c3c;">Zone de danger</h3>
+            <p style="color:var(--brown-soft);margin-bottom:1rem;font-size:0.9rem;">⚠️ Ces actions sont irréversibles.</p>
+            <button class="btn-primary btn-danger btn-sm" onclick="resetData()">🗑️ Remettre les données par défaut</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL ADD/EDIT CAT -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">➕ Ajouter un minouche</h3>
+      <button class="modal-close" onclick="closeModal('catModal')">✕</button>
+    </div>
+    <form id="catForm" onsubmit="saveCat(event)">
+      <input type="hidden" id="catId"/>
+      <div class="form-row">
+        <div class="form-group"><label>Nom *</label><input type="text" class="form-control" id="catName" required placeholder="Luna"/></div>
+        <div class="form-group"><label>Surnom</label><input type="text" class="form-control" id="catNickname" placeholder="La timide"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Âge *</label><input type="text" class="form-control" id="catAge" required placeholder="2 ans / 3 mois"/>
+        </div>
+        <div class="form-group">
+          <label>Âge en mois</label><input type="number" class="form-control" id="catAgeMonths" placeholder="24" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Race</label><input type="text" class="form-control" id="catBreed" placeholder="European shorthair"/></div>
+        <div class="form-group">
+          <label>Sexe</label>
+          <select class="form-control" id="catSex">
+            <option value="M">♂ Mâle</option>
+            <option value="F">♀ Femelle</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Statut</label>
+          <select class="form-control" id="catStatus">
+            <option value="available">✅ Disponible</option>
+            <option value="pending">⏳ Adoption en cours</option>
+            <option value="adopted">🏠 Adopté</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select class="form-control" id="catIsKitten">
+            <option value="false">🐱 Chat adulte</option>
+            <option value="true">🐱 Chaton</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>URL de la photo principale</label><input type="url" class="form-control" id="catImg" placeholder="https://..."/></div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control" id="catDesc" rows="3" placeholder="Décrivez le caractère et l'histoire de ce minouche..."></textarea>
+      </div>
+      <div class="form-group"><label>Traits de caractère (séparés par des virgules)</label><input type="text" class="form-control" id="catTraits" placeholder="Câlin, Joueur, Timide"/></div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:700;font-size:0.85rem;color:var(--brown);display:block;margin-bottom:0.75rem;">Santé</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catVax"/> Vacciné(e)</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catSteri"/> Stérilisé(e)</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catPuce"/> Pucé(e)</label>
+        </div>
+        <input type="text" class="form-control" id="catHealthNote" placeholder="Note santé particulière..." style="margin-top:0.75rem;"/>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem;">
+        <button type="button" class="btn-outline" onclick="closeModal('catModal')">Annuler</button>
+        <button type="submit" class="btn-primary">💾 Sauvegarder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL VIEW APPLICATION -->
+<div class="modal-overlay" id="appModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📋 Détail de la demande</h3>
+      <button class="modal-close" onclick="closeModal('appModal')">✕</button>
+    </div>
+    <div id="appModalContent"></div>
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+// ---- AUTH ----
+function doLogin(e) {
+  e.preventDefault();
+  const pwd = document.getElementById('adminPwd').value;
+  if (DataManager.loginAdmin(pwd)) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'flex';
+    initAdmin();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  DataManager.logoutAdmin();
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+}
+
+// ---- INIT ----
+async function initAdmin() {
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Bannière config si Supabase non configuré
+  if (!DataManager.isConfigured()) {
+    document.getElementById('headerActions').innerHTML = `
+      <div style="background:#fff3e0;border:1.5px solid #f5a623;border-radius:0.75rem;padding:0.5rem 1rem;font-size:0.82rem;color:#5c4033;">
+        ⚠️ Supabase non configuré — <a href="#" onclick="showSection('settings')" style="color:var(--coral);font-weight:700;">Voir les instructions</a>
+      </div>`;
+  }
+
+  await renderStatsBar();
+  await renderCatsTable();
+}
+
+if (DataManager.isAdmin()) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'flex';
+  initAdmin();
+}
+
+// ---- SECTIONS ----
+function showSection(name) {
+  ['cats','applications','stats','settings'].forEach(s => {
+    document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1)).style.display = s === name ? 'block' : 'none';
+    document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('active', s === name);
+  });
+  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
+  document.getElementById('adminTitle').textContent = titles[name] || '';
+  if (name === 'applications') renderAppsTable();
+  if (name === 'stats') loadStatsForm();
+}
+
+// ---- STATS BAR ----
+async function renderStatsBar() {
+  document.getElementById('adminStatsBar').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--brown-soft);">⏳ Chargement...</div>';
+  const cats = await DataManager.getCats();
+  const apps = await DataManager.getApplications();
+  const available = cats.filter(c => c.status === 'available').length;
+  const pending   = cats.filter(c => c.status === 'pending').length;
+  document.getElementById('adminStatsBar').innerHTML = `
+    <div class="admin-stat-card"><div class="admin-stat-icon stat-icon-coral">🐾</div><div><div class="admin-stat-num">${cats.length}</div><div class="admin-stat-label">Total résidents</div></div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon stat-icon-green">✅</div><div><div class="admin-stat-num">${available}</div><div class="admin-stat-label">Disponibles</div></div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon stat-icon-amber">⏳</div><div><div class="admin-stat-num">${pending}</div><div class="admin-stat-label">En cours</div></div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon stat-icon-coral">📋</div><div><div class="admin-stat-num">${apps.filter(a=>a.status==='pending').length}</div><div class="admin-stat-label">Demandes en attente</div></div></div>
+  `;
+}
+
+// ---- CATS TABLE ----
+async function renderCatsTable() {
+  const tbody = document.getElementById('catsTableBody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</td></tr>';
+  const search = (document.getElementById('catSearch')?.value || '').toLowerCase();
+  const filter = document.getElementById('catFilter')?.value || 'all';
+  let cats = await DataManager.getCats();
+  if (search) cats = cats.filter(c => c.name.toLowerCase().includes(search) || (c.breed || '').toLowerCase().includes(search));
+  if (filter !== 'all') cats = cats.filter(c => c.status === filter);
+  document.getElementById('catsCount').textContent = `${cats.length} résidents`;
+  const statusHTML = {
+    available: '<span class="tag-available">✅ Disponible</span>',
+    pending:   '<span class="tag-pending">⏳ En cours</span>',
+    adopted:   '<span class="tag-adopted">🏠 Adopté</span>'
+  };
+  tbody.innerHTML = cats.length ? cats.map(cat => `
+    <tr class="admin-cat-row">
+      <td style="display:flex;align-items:center;gap:0.75rem;">
+        <img src="${cat.img || ''}" class="cat-thumb" alt=""
+             onerror="this.style.display='none'"/>
+        <span class="cat-name">${cat.name}</span>
+      </td>
+      <td>${cat.breed || '—'}</td>
+      <td>${cat.age || '—'}</td>
+      <td>${cat.sex === 'M' ? '♂ Mâle' : '♀ Femelle'}</td>
+      <td>${cat.isKitten ? '🐱 Chaton' : '🐱 Chat'}</td>
+      <td>${statusHTML[cat.status] || cat.status}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditCat('${cat.id}')">✏️ Modifier</button>
+        <button class="btn-del"  onclick="deleteCat('${cat.id}','${cat.name.replace(/'/g,"\\'")}')">🗑️ Supprimer</button>
+        <a href="profil-chat.html?id=${cat.id}" target="_blank" class="btn-edit">👁️ Voir</a>
+      </div></td>
+    </tr>
+  `).join('') : '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucun chat trouvé.</td></tr>';
+}
+
+// ---- ADD / EDIT CAT ----
+function openAddCat() {
+  document.getElementById('modalTitle').textContent = '➕ Ajouter un minouche';
+  document.getElementById('catId').value = '';
+  document.getElementById('catForm').reset();
+  openModal('catModal');
+}
+
+async function openEditCat(id) {
+  const cat = await DataManager.getCatById(id);
+  if (!cat) return;
+  document.getElementById('modalTitle').textContent = `✏️ Modifier ${cat.name}`;
+  document.getElementById('catId').value           = cat.id;
+  document.getElementById('catName').value         = cat.name || '';
+  document.getElementById('catNickname').value     = cat.nickname || '';
+  document.getElementById('catAge').value          = cat.age || '';
+  document.getElementById('catAgeMonths').value    = cat.ageMonths || '';
+  document.getElementById('catBreed').value        = cat.breed || '';
+  document.getElementById('catSex').value          = cat.sex || 'M';
+  document.getElementById('catStatus').value       = cat.status || 'available';
+  document.getElementById('catIsKitten').value     = cat.isKitten ? 'true' : 'false';
+  document.getElementById('catImg').value          = cat.img || '';
+  document.getElementById('catDesc').value         = cat.description || '';
+  document.getElementById('catTraits').value       = (cat.traits || []).join(', ');
+  document.getElementById('catVax').checked        = cat.health?.vaccinated || false;
+  document.getElementById('catSteri').checked      = cat.health?.sterilized || false;
+  document.getElementById('catPuce').checked       = cat.health?.microchipped || false;
+  document.getElementById('catHealthNote').value   = cat.health?.note || '';
+  openModal('catModal');
+}
+
+async function saveCat(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type="submit"]');
+  btn.textContent = '⏳ Sauvegarde...'; btn.disabled = true;
+
+  const id = document.getElementById('catId').value;
+  const imgUrl = document.getElementById('catImg').value.trim();
+  const cat = {
+    name:        document.getElementById('catName').value.trim(),
+    nickname:    document.getElementById('catNickname').value.trim(),
+    age:         document.getElementById('catAge').value.trim(),
+    ageMonths:   parseInt(document.getElementById('catAgeMonths').value) || 0,
+    breed:       document.getElementById('catBreed').value.trim(),
+    sex:         document.getElementById('catSex').value,
+    status:      document.getElementById('catStatus').value,
+    isKitten:    document.getElementById('catIsKitten').value === 'true',
+    img:         imgUrl,
+    imgs:        imgUrl ? [imgUrl] : [],
+    description: document.getElementById('catDesc').value.trim(),
+    traits:      document.getElementById('catTraits').value.split(',').map(t => t.trim()).filter(Boolean),
+    health: {
+      vaccinated:   document.getElementById('catVax').checked,
+      sterilized:   document.getElementById('catSteri').checked,
+      microchipped: document.getElementById('catPuce').checked,
+      note:         document.getElementById('catHealthNote').value.trim()
+    }
+  };
+
+  try {
+    if (id) {
+      await DataManager.updateCat(id, cat);
+      showToast(`✅ ${cat.name} mis à jour !`);
+    } else {
+      await DataManager.addCat(cat);
+      showToast(`✅ ${cat.name} ajouté avec succès !`);
+    }
+    closeModal('catModal');
+    await renderCatsTable();
+    await renderStatsBar();
+  } catch (err) {
+    showToast('❌ Erreur : ' + err.message, 'error');
+  } finally {
+    btn.textContent = '💾 Sauvegarder'; btn.disabled = false;
+  }
+}
+
+async function deleteCat(id, name) {
+  if (!confirm(`Supprimer ${name} ? Cette action est irréversible.`)) return;
+  try {
+    await DataManager.deleteCat(id);
+    await renderCatsTable();
+    await renderStatsBar();
+    showToast(`🗑️ ${name} supprimé`, 'info');
+  } catch (err) {
+    showToast('❌ Erreur suppression : ' + err.message, 'error');
+  }
+}
+
+// ---- APPLICATIONS ----
+async function renderAppsTable() {
+  document.getElementById('appsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</td></tr>';
+  const apps = await DataManager.getApplications();
+  document.getElementById('appsCount').textContent = `${apps.length} demandes`;
+  const statTags = {
+    pending:  '<span class="tag-pending">⏳ En attente</span>',
+    approved: '<span class="tag-available">✅ Approuvée</span>',
+    rejected: '<span style="color:#e74c3c;background:#fde8e7;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.8rem;font-weight:700;">❌ Refusée</span>'
+  };
+  document.getElementById('appsTableBody').innerHTML = apps.length ? apps.map(app => `
+    <tr>
+      <td><strong>${app.firstName} ${app.lastName}</strong></td>
+      <td>${app.email}</td>
+      <td>${app.catId || '—'}</td>
+      <td>${app.date ? new Date(app.date).toLocaleDateString('fr-FR') : '—'}</td>
+      <td>${statTags[app.status] || app.status}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="viewApp('${app.id}')">👁️ Voir</button>
+        <button class="btn-edit" onclick="updateApp('${app.id}','approved')" style="background:#e8f8e8;color:var(--green);">✅</button>
+        <button class="btn-del"  onclick="updateApp('${app.id}','rejected')">❌</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucune demande pour le moment.</td></tr>';
+}
+
+async function viewApp(id) {
+  const apps = await DataManager.getApplications();
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  document.getElementById('appModalContent').innerHTML = `
+    <div style="display:grid;gap:0.75rem;font-size:0.9rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div><strong>Nom :</strong> ${app.firstName} ${app.lastName}</div>
+        <div><strong>Email :</strong> <a href="mailto:${app.email}" style="color:var(--coral);">${app.email}</a></div>
+        <div><strong>Tél. :</strong> ${app.phone || '—'}</div>
+        <div><strong>Adresse :</strong> ${app.address || '—'}</div>
+      </div>
+      <hr style="border-color:var(--cream-dark);"/>
+      <div><strong>Minouche :</strong> ${app.catId || '—'}</div>
+      <div><strong>Logement :</strong> ${app.housing || '—'} · Extérieur : ${app.outdoor || '—'}</div>
+      <div><strong>Enfants :</strong> ${app.children || '—'}</div>
+      <div><strong>Autres animaux :</strong> ${app.otherPets || '—'}</div>
+      <div><strong>Expérience :</strong> ${app.experience || '—'}</div>
+      <div><strong>Heures seul/jour :</strong> ${app.hoursAlone || '—'}h</div>
+      ${app.motivation ? `<div><strong>Motivations :</strong> ${app.motivation}</div>` : ''}
+      <div style="display:flex;gap:1rem;margin-top:0.5rem;justify-content:flex-end;">
+        <button class="btn-primary btn-success btn-sm" onclick="updateApp('${app.id}','approved');closeModal('appModal')">✅ Approuver</button>
+        <button class="btn-primary btn-danger btn-sm"  onclick="updateApp('${app.id}','rejected');closeModal('appModal')">❌ Refuser</button>
+      </div>
+    </div>`;
+  openModal('appModal');
+}
+
+async function updateApp(id, status) {
+  await DataManager.updateApplication(id, { status });
+  await renderAppsTable();
+  showToast(status === 'approved' ? '✅ Demande approuvée !' : '❌ Demande refusée', status === 'approved' ? 'success' : 'error');
+}
+
+// ---- STATS ----
+async function loadStatsForm() {
+  const s = await DataManager.getStats();
+  const a = document.getElementById('statAdoptedInput'); if(a) a.value = s.totalAdopted;
+  const r = document.getElementById('statRescuedInput'); if(r) r.value = s.totalRescued;
+  const y = document.getElementById('statYearsInput');   if(y) y.value = s.yearsActive;
+}
+
+async function saveStats(e) {
+  e.preventDefault();
+  try {
+    await DataManager.updateStats({
+      totalAdopted: parseInt(document.getElementById('statAdoptedInput').value),
+      totalRescued: parseInt(document.getElementById('statRescuedInput').value),
+      yearsActive:  parseInt(document.getElementById('statYearsInput').value)
+    });
+    showToast('✅ Statistiques mises à jour !');
+  } catch(err) {
+    showToast('❌ Erreur : ' + err.message, 'error');
+  }
+}
+
+// ---- SETTINGS ----
+function changePwd(e) {
+  e.preventDefault();
+  const p1 = document.getElementById('newPwd1').value;
+  const p2 = document.getElementById('newPwd2').value;
+  if (p1 !== p2) { showToast('Les mots de passe ne correspondent pas !', 'error'); return; }
+  localStorage.setItem('ptm_admin_pwd', p1);
+  showToast('✅ Mot de passe changé !');
+  e.target.reset();
+}
+
+function resetData() {
+  showToast('Pour réinitialiser, supprimez les lignes directement dans Supabase (Table Editor).', 'info');
+}
+
+// ---- MODAL UTILS ----
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+</script>
+</body>
+</html>

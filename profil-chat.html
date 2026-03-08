@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Profil Chat — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li>
+      <li><a href="chatons.html">Chatons</a></li>
+      <li><a href="adoption.html">Adopter</a></li>
+      <li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="profil-page" id="profilPage">
+  <div style="text-align:center;padding:4rem;color:var(--brown-soft);">
+    <div style="font-size:3rem;margin-bottom:1rem;">🐱</div>
+    <p>Chargement du profil...</p>
+  </div>
+</div>
+
+<!-- Scrapbook deco -->
+<div class="scrapbook-deco" style="position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;">
+  <span style="position:absolute;top:15%;left:3%;font-size:2rem;opacity:0.08;">🐾</span>
+  <span style="position:absolute;top:40%;right:3%;font-size:2rem;opacity:0.08;">❤️</span>
+  <span style="position:absolute;bottom:20%;left:5%;font-size:2rem;opacity:0.08;">⭐</span>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><a href="chats.html">← Retour aux chats</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+async function renderProfil() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const cat = id ? await DataManager.getCatById(id) : null;
+  const page = document.getElementById('profilPage');
+
+  if (!cat) {
+    page.innerHTML = `<div style="text-align:center;padding:5rem 2rem;"><div style="font-size:5rem;">😿</div><h2>Minouche introuvable</h2><p style="color:var(--brown-soft);margin:1rem 0 2rem;">Ce profil n'existe plus ou a déjà trouvé sa famille !</p><a href="chats.html" class="btn-primary">← Voir tous nos chats</a></div>`;
+    return;
+  }
+
+  const statusTags = { available: '<span class="tag-available">✅ Disponible à l\'adoption</span>', pending: '<span class="tag-pending">⏳ Adoption en cours</span>', adopted: '<span class="tag-adopted">🏠 Adopté</span>' };
+  const backUrl = cat.isKitten ? 'chatons.html' : 'chats.html';
+  const backLabel = cat.isKitten ? '← Retour aux chatons' : '← Retour aux chats';
+
+  const healthItems = [
+    { label: 'Vacciné(e)', ok: cat.health?.vaccinated },
+    { label: 'Stérilisé(e)', ok: cat.health?.sterilized },
+    { label: 'Identifié(e) / pucé(e)', ok: cat.health?.microchipped }
+  ];
+
+  const thumbsHtml = (cat.imgs && cat.imgs.length > 1) ?
+    cat.imgs.map((src, i) => `<img src="${src}" class="profil-thumb ${i===0?'active':''}" onclick="switchImg('${src}', this)" alt="Photo ${i+1}" loading="lazy"/>`).join('') : '';
+
+  const similarCats = (await DataManager.getCats()).filter(c => c.id !== cat.id && c.status === 'available').slice(0, 3);
+
+  page.innerHTML = `
+    <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <a href="${backUrl}" class="btn-outline btn-sm">${backLabel}</a>
+      ${statusTags[cat.status] || ''}
+    </div>
+
+    <div class="profil-grid">
+      <!-- Photo -->
+      <div class="profil-photo-wrap">
+        <div class="polaroid profil-polaroid">
+          <img src="${cat.img}" alt="${cat.name}" class="profil-main-img" id="mainImg" loading="lazy"/>
+          <p class="profil-caption">${cat.name}, ${cat.nickname ? `« ${cat.nickname} »` : cat.age}</p>
+        </div>
+        ${thumbsHtml ? `<div class="profil-thumbs">${thumbsHtml}</div>` : ''}
+        ${cat.status === 'available' ? `
+        <div style="text-align:center;margin-top:1.5rem;">
+          <button class="adopt-heart" onclick="location.href='adoption.html?cat=${cat.id}'">
+            <span style="font-size:1.5rem;">💌</span>
+            ADOPTE<br/>MOI !
+          </button>
+        </div>` : ''}
+      </div>
+
+      <!-- Info -->
+      <div>
+        <h1 style="font-size:2.5rem;color:var(--brown);margin-bottom:0.25rem;">${cat.name}</h1>
+        <p style="color:var(--brown-soft);font-size:1.1rem;margin-bottom:1.5rem;">
+          ${cat.breed} · ${cat.age} · ${cat.sex === 'M' ? '♂ Mâle' : '♀ Femelle'} · ${cat.color || ''}
+        </p>
+
+        <div class="profil-cards">
+          <!-- Histoire -->
+          <div class="profil-card" style="grid-column:1/-1;">
+            <h3>📖 Son histoire</h3>
+            <p style="color:var(--brown-soft);line-height:1.8;">${cat.description}</p>
+          </div>
+
+          <!-- Santé -->
+          <div class="profil-card">
+            <h3>🏥 Santé</h3>
+            ${healthItems.map(h => `
+              <div class="profil-health-item">
+                <span class="${h.ok ? 'health-ok' : 'health-no'}">${h.ok ? '✅' : '❌'}</span>
+                ${h.label}
+              </div>
+            `).join('')}
+            ${cat.health?.note ? `<p style="font-size:0.8rem;color:var(--brown-soft);margin-top:0.75rem;background:var(--cream-dark);padding:0.5rem;border-radius:0.5rem;">ℹ️ ${cat.health.note}</p>` : ''}
+          </div>
+
+          <!-- Caractère -->
+          <div class="profil-card">
+            <h3>💫 Caractère</h3>
+            ${(cat.traits || []).map(t => `<div class="profil-trait-item">🐾 ${t}</div>`).join('')}
+          </div>
+        </div>
+
+        ${cat.status === 'available' ? `
+        <div style="margin-top:2rem;background:var(--coral-light);border:2px solid var(--coral);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;">
+          <h3 style="font-size:1.05rem;margin-bottom:0.5rem;">💌 Prêt(e) à accueillir ${cat.name} ?</h3>
+          <p style="color:var(--brown-soft);font-size:0.9rem;margin-bottom:1rem;">Remplissez notre dossier d'adoption pour commencer la procédure.</p>
+          <a href="adoption.html?cat=${cat.id}" class="btn-primary">Commencer la demande d'adoption →</a>
+        </div>` : `
+        <div style="margin-top:2rem;background:var(--cream-dark);border:2px solid var(--brown-light);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;">
+          <p style="color:var(--brown-soft);font-size:0.9rem;">Ce minouche n'est plus disponible. Découvrez nos autres résidents !</p>
+          <a href="${backUrl}" class="btn-outline btn-sm" style="margin-top:0.75rem;">Voir les autres →</a>
+        </div>`}
+      </div>
+    </div>
+
+    <!-- Similaires -->
+    ${similarCats.length ? `
+    <div style="margin-top:4rem;">
+      <div class="section-header">
+        <div class="section-tape section-tape-left"></div>
+        <h2 class="section-title">Ils cherchent aussi une famille 🐾</h2>
+        <div class="section-tape section-tape-right"></div>
+      </div>
+      <div class="cats-grid" style="max-width:100%;padding:1rem 0;">
+        ${similarCats.map(c => createCatCard(c)).join('')}
+      </div>
+    </div>` : ''}
+  `;
+
+  // Update page title
+  document.title = `${cat.name} — Pas touche aux Minouches`;
+}
+
+function switchImg(src, el) {
+  document.getElementById('mainImg').src = src;
+  document.querySelectorAll('.profil-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+renderProfil();
+</script>
+</body>
+</html>

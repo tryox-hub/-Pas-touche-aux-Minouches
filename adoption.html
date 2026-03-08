@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Demande d'adoption — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li><li><a href="chatons.html">Chatons</a></li>
+      <li><a href="adoption.html" class="active">Adopter</a></li>
+      <li><a href="a-propos.html">À Propos</a></li><li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="adoption-page">
+  <div class="scrapbook-deco" style="position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;">
+    <span style="position:absolute;top:20%;left:2%;font-size:2rem;opacity:0.1;">🐾</span>
+    <span style="position:absolute;top:50%;right:2%;font-size:2rem;opacity:0.1;">❤️</span>
+    <span style="position:absolute;bottom:10%;left:8%;font-size:2rem;opacity:0.1;">⭐</span>
+  </div>
+
+  <h1>Demande d'adoption 🐾</h1>
+  <p class="page-sub">Dites-nous un peu qui vous êtes pour qu'on trouve le purr-fect match !</p>
+
+  <div id="catPreview" style="display:none;"></div>
+
+  <!-- SUCCESS -->
+  <div id="successMsg" style="display:none;text-align:center;padding:3rem;background:white;border-radius:var(--radius-xl);box-shadow:var(--shadow);border:2px solid var(--green);margin-bottom:2rem;">
+    <div style="font-size:4rem;margin-bottom:1rem;">🎉</div>
+    <h2 style="color:var(--green);margin-bottom:0.75rem;">Purr-fect ! Nous avons reçu votre demande !</h2>
+    <p style="color:var(--brown-soft);margin-bottom:1.5rem;">On examine votre dossier avec une tasse de thé et on vous recontacte dans 3 à 6 jours. Les minouches vous remercient ! 🐾</p>
+    <a href="chats.html" class="btn-primary">Voir d'autres minouches →</a>
+  </div>
+
+  <form id="adoptionForm" onsubmit="handleAdoption(event)" style="display:block;">
+    <!-- 1. Qui êtes-vous ? -->
+    <div class="form-section" data-tape="🐾 SECTION 1 / 3">
+      <h3>1. Qui êtes-vous ? 👤</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Prénom *</label><input type="text" class="form-control" name="firstName" placeholder="ex : Marie" required/></div>
+        <div class="form-group"><label>Nom *</label><input type="text" class="form-control" name="lastName" placeholder="ex : Dupont" required/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" placeholder="marie@email.fr" required/></div>
+        <div class="form-group"><label>Téléphone</label><input type="tel" class="form-control" name="phone" placeholder="06 12 34 56 78"/></div>
+      </div>
+      <div class="form-group"><label>Adresse complète *</label><input type="text" class="form-control" name="address" placeholder="Numéro et nom de rue" required/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Code postal</label><input type="text" class="form-control" name="zip" placeholder="75001"/></div>
+        <div class="form-group"><label>Ville</label><input type="text" class="form-control" name="city" placeholder="Paris"/></div>
+      </div>
+    </div>
+
+    <hr class="wave-divider"/>
+
+    <!-- 2. Votre foyer -->
+    <div class="form-section" data-tape="🏠 SECTION 2 / 3">
+      <h3>2. Votre foyer 🏠</h3>
+      <div class="form-group">
+        <label>Type de logement *</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="radio" name="housing" value="house" required/> 🏠 Maison</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="radio" name="housing" value="apartment"/> 🏢 Appartement</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="radio" name="housing" value="other"/> 🏡 Autre</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Accès extérieur sécurisé ?</label>
+          <select class="form-control" name="outdoor">
+            <option value="none">Non / Intérieur uniquement</option>
+            <option value="balcony">Balcon / terrasse</option>
+            <option value="enclosed">Jardin clos</option>
+            <option value="free">Accès libre extérieur</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Enfants dans le foyer ?</label>
+          <select class="form-control" name="children">
+            <option value="none">Aucun enfant</option>
+            <option value="babies">Bébés (0-3 ans)</option>
+            <option value="young">Jeunes enfants (3-10 ans)</option>
+            <option value="teens">Ados (10-18 ans)</option>
+            <option value="adult">Enfants adultes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Autres animaux ?</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.5rem;margin-bottom:0.75rem;">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="checkbox" name="otherPets" value="cats"/> 🐱 Chats</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="checkbox" name="otherPets" value="dogs"/> 🐶 Chiens</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-weight:500;cursor:pointer;"><input type="checkbox" name="otherPets" value="small"/> 🐹 Petits animaux</label>
+        </div>
+        <textarea class="form-control" name="otherPetsDetail" placeholder="Décrivez-les un peu (âge, caractère, entente avec les chats)..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <hr class="wave-divider"/>
+
+    <!-- 3. Expérience & motivations -->
+    <div class="form-section" data-tape="💛 SECTION 3 / 3">
+      <h3>3. Votre expérience 💛</h3>
+      <div class="form-group">
+        <label>Votre historique avec les chats *</label>
+        <textarea class="form-control" name="experience" placeholder="Avez-vous déjà eu des chats ? Comment s'appelaient-ils ?" required rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Heures seul par jour</label>
+          <select class="form-control" name="hoursAlone">
+            <option value="0">Jamais seul</option>
+            <option value="3">Moins de 3h</option>
+            <option value="6">3 à 6h</option>
+            <option value="8">6 à 8h (journée de travail)</option>
+            <option value="10">Plus de 8h</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ce que vous recherchez</label>
+          <select class="form-control" name="looking">
+            <option value="calm">Un chat calme et câlin</option>
+            <option value="playful">Un chat joueur et dynamique</option>
+            <option value="kitten">Un chaton à élever</option>
+            <option value="companion">Un compagnon indépendant</option>
+            <option value="open">Ouvert à toutes propositions !</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Le minouche qui vous intéresse (si vous avez un coup de coeur)</label>
+        <select class="form-control" name="catId" id="catSelect">
+          <option value="">-- Pas de préférence pour le moment --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vos motivations & questions 💬</label>
+        <textarea class="form-control" name="motivation" placeholder="Pourquoi souhaitez-vous adopter ? Des questions à nous poser ?" rows="4"></textarea>
+      </div>
+    </div>
+
+    <div style="background:var(--cream-dark);border-radius:var(--radius-lg);padding:1rem 1.5rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--brown-soft);border:1.5px dashed var(--brown-light);">
+      ℹ️ En soumettant ce formulaire, vous acceptez que nous traitions vos données pour la procédure d'adoption. Vos informations restent confidentielles et ne sont pas transmises à des tiers.
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary btn-large">💌 Envoyer ma demande d'adoption →</button>
+    </div>
+  </form>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><a href="chats.html">← Voir nos chats</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+// Pre-fill cat from URL param
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const catId = params.get('cat');
+  
+  // Populate cat select
+  const sel = document.getElementById('catSelect');
+  const cats = await DataManager.getAllAvailable();
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.name} — ${c.breed} (${c.age})`;
+    sel.appendChild(opt);
+  });
+
+  if (catId) {
+    sel.value = catId;
+    const cat = DataManager.getCatById(catId);
+    if (cat) {
+      const preview = document.getElementById('catPreview');
+      preview.style.display = 'block';
+      preview.innerHTML = `
+        <div style="display:flex;align-items:center;gap:1.25rem;background:white;padding:1.25rem;border-radius:var(--radius-lg);border:2px solid var(--coral-light);margin-bottom:1.5rem;box-shadow:var(--shadow);">
+          <img src="${cat.img}" alt="${cat.name}" style="width:70px;height:70px;border-radius:12px;object-fit:cover;"/>
+          <div>
+            <p style="font-size:0.85rem;color:var(--brown-soft);">Vous adoptez :</p>
+            <strong style="font-size:1.2rem;font-family:var(--font-display);color:var(--brown);">${cat.name}</strong>
+            <p style="font-size:0.9rem;color:var(--brown-soft);">${cat.breed} · ${cat.age} · ${cat.sex === 'M' ? '♂ Mâle' : '♀ Femelle'}</p>
+          </div>
+          <a href="profil-chat.html?id=${cat.id}" class="btn-outline btn-sm" style="margin-left:auto;">Voir le profil</a>
+        </div>`;
+    }
+  }
+});
+
+async function handleAdoption(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const app = {
+    firstName: data.get('firstName'),
+    lastName: data.get('lastName'),
+    email: data.get('email'),
+    phone: data.get('phone'),
+    address: `${data.get('address')}, ${data.get('zip')} ${data.get('city')}`,
+    housing: data.get('housing'),
+    outdoor: data.get('outdoor'),
+    children: data.get('children'),
+    otherPets: data.getAll('otherPets').join(', '),
+    otherPetsDetail: data.get('otherPetsDetail'),
+    experience: data.get('experience'),
+    hoursAlone: data.get('hoursAlone'),
+    looking: data.get('looking'),
+    catId: data.get('catId'),
+    motivation: data.get('motivation')
+  };
+
+  await DataManager.addApplication(app);
+
+  // Mark cat as pending if selected
+  if (app.catId) await DataManager.updateCat(app.catId, { status: 'pending' });
+
+  form.style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+  document.getElementById('catPreview').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

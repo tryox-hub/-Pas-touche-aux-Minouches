@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chatons — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li>
+      <li><a href="chatons.html" class="active">Chatons</a></li>
+      <li><a href="adoption.html">Adopter</a></li>
+      <li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<header class="page-header">
+  <h1>🐱 Nos petits Chatons</h1>
+  <p>Ces mini boules de poils ont besoin d'une famille aimante pour grandir et s'épanouir !</p>
+  <div style="background:#fff3e0;border:2px solid #f5a623;border-radius:1rem;padding:0.75rem 1.5rem;display:inline-block;margin-top:1rem;font-size:0.9rem;color:#5c4033;">
+    ⚠️ Les chatons de moins de 3 mois ne peuvent être adoptés qu'en binôme pour leur épanouissement.
+  </div>
+</header>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+  <div class="filters-bar">
+    <span class="filter-label">Filtrer :</span>
+    <button class="filter-btn active" onclick="filterCats('all')">Tous</button>
+    <button class="filter-btn" onclick="filterCats('available')">✅ Disponibles</button>
+    <button class="filter-btn" onclick="filterCats('M')">♂ Mâles</button>
+    <button class="filter-btn" onclick="filterCats('F')">♀ Femelles</button>
+    <button class="filter-btn" onclick="filterCats('tiny')">🍼 Très jeunes (- 3 mois)</button>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-header">
+    <div class="section-tape section-tape-left"></div>
+    <h2 class="section-title" id="sectionTitle">Les Petits Chatons 🐱</h2>
+    <div class="section-tape section-tape-right"></div>
+  </div>
+  <div class="cats-grid" id="catsGrid"></div>
+  <div class="pagination" id="pagination"></div>
+</section>
+
+<section class="section section-cream">
+  <div class="section-header">
+    <div class="section-tape section-tape-left"></div>
+    <h2 class="section-title">Adopter un chaton 🏠</h2>
+    <div class="section-tape section-tape-right"></div>
+  </div>
+  <div class="steps-grid" style="max-width:900px;margin:0 auto;">
+    <div class="step-card"><div class="step-num">💡</div><div class="step-icon">🏠</div><h3>Espace sécurisé</h3><p>Un chaton a besoin d'un environnement sécurisé sans risques de fugue ou d'accidents.</p></div>
+    <div class="step-card"><div class="step-num">💡</div><div class="step-icon">⏰</div><h3>Présence & temps</h3><p>Les chatons ont besoin de beaucoup d'attention et de jeux. Prévoyez du temps de qualité.</p></div>
+    <div class="step-card"><div class="step-num">💡</div><div class="step-icon">💰</div><h3>Budget santé</h3><p>Vaccination, stérilisation future, nourriture de qualité... prévoyez un budget mensuel.</p></div>
+    <div class="step-card"><div class="step-num">💡</div><div class="step-icon">❤️</div><h3>Engagement long terme</h3><p>Un chat peut vivre 15-20 ans. C'est un engagement à long terme qui demande responsabilité.</p></div>
+  </div>
+  <div class="section-cta">
+    <a href="adoption.html" class="btn-primary btn-large">Demander l'adoption d'un chaton 💌</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div><div class="footer-sub">Association loi 1901</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><h4>Navigation</h4><a href="chats.html">Chats</a><a href="chatons.html">Chatons</a><a href="adoption.html">Adopter</a><a href="don.html">Donner</a></div>
+      <div class="footer-col"><h4>Association</h4><a href="a-propos.html">À propos</a><a href="contact.html">Contact</a><a href="mentions-legales.html">Mentions légales</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+const PAGE_SIZE = 9;
+let currentPage = 1, currentFilter = 'all', allCats = [];
+
+async function loadCats() { allCats = (await DataManager.getCats()).filter(c => c.isKitten); }
+function filterCats(f) {
+  currentFilter = f; currentPage = 1;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderPage();
+}
+function getFiltered() {
+  return allCats.filter(c => {
+    if (currentFilter === 'available') return c.status === 'available';
+    if (currentFilter === 'M') return c.sex === 'M';
+    if (currentFilter === 'F') return c.sex === 'F';
+    if (currentFilter === 'tiny') return c.ageMonths < 3;
+    return true;
+  });
+}
+function renderPage() {
+  const filtered = getFiltered();
+  const page = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  document.getElementById('sectionTitle').textContent = `${filtered.length} chaton${filtered.length > 1 ? 's' : ''} trouvé${filtered.length > 1 ? 's' : ''} 🐱`;
+  const grid = document.getElementById('catsGrid');
+  if (!page.length) { grid.innerHTML = '<p class="no-cats">Aucun chaton disponible pour le moment. Revenez bientôt !</p>'; return; }
+  grid.innerHTML = page.map(cat => createCatCard(cat)).join('');
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  let html = '';
+  if (pages > 1) {
+    html = `<button class="page-arrow" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>◀</button>`;
+    for(let i=1;i<=pages;i++) html += `<button class="page-num ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    html += `<button class="page-arrow" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>▶</button>`;
+  }
+  document.getElementById('pagination').innerHTML = html;
+}
+function goPage(p) { const total = Math.ceil(getFiltered().length/PAGE_SIZE); if(p<1||p>total)return; currentPage=p; renderPage(); window.scrollTo({top:300,behavior:'smooth'}); }
+async function init() { await loadCats(); renderPage(); }
+init();
+</script>
+</body>
+</html>

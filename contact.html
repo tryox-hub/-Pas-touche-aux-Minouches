@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contact — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li><li><a href="chatons.html">Chatons</a></li>
+      <li><a href="adoption.html">Adopter</a></li><li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="contact-page">
+  <div style="padding-top:30px;"></div>
+  <h1>📬 Contactez-nous</h1>
+
+  <div class="contact-info">
+    <div class="contact-info-item">
+      <div class="ci-icon">✉️</div>
+      <p>Email</p>
+      <strong><a href="mailto:contact@pastoucheauxminouches.fr" style="color:var(--coral);">contact@pastoucheauxminouches.fr</a></strong>
+    </div>
+    <div class="contact-info-item">
+      <div class="ci-icon">📘</div>
+      <p>Facebook</p>
+      <strong><a href="#" target="_blank" style="color:var(--coral);">@pastoucheauxminouches</a></strong>
+    </div>
+    <div class="contact-info-item">
+      <div class="ci-icon">📸</div>
+      <p>Instagram</p>
+      <strong><a href="#" target="_blank" style="color:var(--coral);">@ptaminouches</a></strong>
+    </div>
+  </div>
+
+  <div id="successContact" style="display:none;text-align:center;padding:2rem;background:white;border-radius:var(--radius-xl);border:2px solid var(--green);box-shadow:var(--shadow);margin-bottom:2rem;">
+    <div style="font-size:3rem;margin-bottom:0.75rem;">✅</div>
+    <h3 style="color:var(--green);">Message envoyé !</h3>
+    <p style="color:var(--brown-soft);">Nous vous répondrons dans les meilleurs délais. Les minouches vous remercient !</p>
+  </div>
+
+  <div class="form-section" data-tape="💬 VOTRE MESSAGE">
+    <h3>Envoyez-nous un message 💌</h3>
+    <form id="contactForm" onsubmit="handleContact(event)">
+      <div class="form-row">
+        <div class="form-group"><label>Prénom *</label><input type="text" class="form-control" name="firstName" required placeholder="Marie"/></div>
+        <div class="form-group"><label>Nom *</label><input type="text" class="form-control" name="lastName" required placeholder="Dupont"/></div>
+      </div>
+      <div class="form-group"><label>Email *</label><input type="email" class="form-control" name="email" required placeholder="marie@email.fr"/></div>
+      <div class="form-group">
+        <label>Sujet *</label>
+        <select class="form-control" name="subject" required>
+          <option value="">-- Choisissez un sujet --</option>
+          <option value="adoption">Demande d'adoption</option>
+          <option value="signalement">Signalement d'un animal</option>
+          <option value="accueil">Devenir famille d'accueil</option>
+          <option value="benevole">Devenir bénévole</option>
+          <option value="don">Don & partenariat</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message *</label>
+        <textarea class="form-control" name="message" required rows="5" placeholder="Votre message..."></textarea>
+      </div>
+      <div style="text-align:center;margin-top:1rem;">
+        <button type="submit" class="btn-primary btn-large">Envoyer le message 💌</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Urgence -->
+  <div style="background:#fff3e0;border:2px solid var(--amber);border-radius:var(--radius-lg);padding:1.5rem 2rem;margin-top:1.5rem;">
+    <h3 style="color:var(--amber);margin-bottom:0.5rem;">⚠️ Vous avez trouvé un chat en détresse ?</h3>
+    <p style="color:var(--brown-soft);margin-bottom:1rem;">Contactez-nous immédiatement par email ou via nos réseaux sociaux. En cas d'urgence vétérinaire, contactez directement une clinique vétérinaire.</p>
+    <a href="mailto:urgence@pastoucheauxminouches.fr" class="btn-primary" style="background:var(--amber);">📧 Contacter l'équipe urgences</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><h4>Navigation</h4><a href="chats.html">Chats</a><a href="don.html">Donner</a><a href="adoption.html">Adopter</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+function handleContact(e) {
+  e.preventDefault();
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('successContact').style.display = 'block';
+  window.scrollTo({ top: 200, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
