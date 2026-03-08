@@ -1,20 +1,6 @@
-// =============================================
-// DATA.JS — Gestionnaire de données Supabase
-// =============================================
-//
-// ╔══════════════════════════════════════════╗
-// ║         CONFIGURATION SUPABASE           ║
-// ║                                          ║
-// ║  1. Allez sur https://supabase.com       ║
-// ║  2. Créez un compte gratuit              ║
-// ║  3. "New project" → nommez-le            ║
-// ║  4. Allez dans Settings > API            ║
-// ║  5. Copiez "Project URL" et "anon key"   ║
-// ║  6. Collez-les ci-dessous                ║
-// ╚══════════════════════════════════════════╝
 
-const SUPABASE_URL = 'VOTRE_URL_SUPABASE';        // ex: https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';       // ex: eyJhbGci...
+const SUPABASE_URL = 'https://hsmwrcrdwmfgufesufpl.supabase.co';        // 
+const SUPABASE_ANON_KEY = 'sb_publishable_4mKjCFhjwt9SRf3U19afow_GhEGr9JH';       // 
 
 // =============================================
 // SCRIPT SQL À EXÉCUTER dans Supabase
