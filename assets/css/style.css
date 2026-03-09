@@ -63,9 +63,9 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .logo-title { display: block; font-size: 0.95rem; line-height: 1.2; color: var(--brown); }
 .logo-bold { font-size: 1.2rem; font-weight: 700; color: var(--coral); }
 /* NAV - mobile first */
-.nav-links { display: none; list-style: none; gap: 0.75em; margin-left: auto; }
+.nav-links { display: none; list-style: none; gap: 0.25em; margin-left: auto; }
 .nav-links a {
-  padding: 0.5rem 1rem; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem;
+  padding: 0.5rem 1rem; border-radius: var(--radius); font-weight: 1600; font-size: 0.95rem;
   color: var(--brown-soft); transition: var(--transition);
 }
 .nav-links a:hover, .nav-links a.active { background: var(--coral-light); color: var(--coral); }
