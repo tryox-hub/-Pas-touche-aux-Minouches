@@ -13,8 +13,8 @@
 // ║  6. Collez-les ci-dessous                ║
 // ╚══════════════════════════════════════════╝
 
-const SUPABASE_URL = 'VOTRE_URL_SUPABASE';        // ex: https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';       // ex: eyJhbGci...
+const SUPABASE_URL = 'https://hsmwrcrdwmfgufesufpl.supabase.co';        // ex: https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_4mKjCFhjwt9SRf3U19afow_GhEGr9JH';       // ex: eyJhbGci...
 
 // =============================================
 // SCRIPT SQL À EXÉCUTER dans Supabase
