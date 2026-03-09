@@ -163,7 +163,6 @@
           <div class="form-section" data-tape="🔐 SÉCURITÉ" style="background:var(--cream);margin-bottom:1.5rem;">
             <h3>Changer le mot de passe admin</h3>
             <form onsubmit="changePwd(event)">
-              <div class="form-group"><label>Ancien mot de passe *</label><input type="password" class="form-control" id="oldPwd" required placeholder="Votre mot de passe actuel"/></div>
               <div class="form-group"><label>Nouveau mot de passe *</label><input type="password" class="form-control" id="newPwd1" required minlength="8" placeholder="Min. 8 caractères"/></div>
               <div class="form-group"><label>Confirmer *</label><input type="password" class="form-control" id="newPwd2" required/></div>
               <button type="submit" class="btn-primary">🔒 Changer le mot de passe</button>
@@ -268,19 +267,15 @@
 <script src="assets/js/main.js"></script>
 <script>
 // ---- AUTH ----
-async function doLogin(e) {
+function doLogin(e) {
   e.preventDefault();
   const pwd = document.getElementById('adminPwd').value;
-  const btn = e.target.querySelector('button');
-  btn.textContent = '⏳ Vérification...'; btn.disabled = true;
-  const ok = await DataManager.loginAdmin(pwd);
-  if (ok) {
+  if (DataManager.loginAdmin(pwd)) {
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'flex';
     initAdmin();
   } else {
     document.getElementById('loginError').style.display = 'block';
-    btn.textContent = 'Se connecter'; btn.disabled = false;
   }
 }
 
@@ -546,23 +541,14 @@ async function saveStats(e) {
 }
 
 // ---- SETTINGS ----
-async function changePwd(e) {
+function changePwd(e) {
   e.preventDefault();
-  const oldPwd = document.getElementById('oldPwd').value;
   const p1 = document.getElementById('newPwd1').value;
   const p2 = document.getElementById('newPwd2').value;
   if (p1 !== p2) { showToast('Les mots de passe ne correspondent pas !', 'error'); return; }
-  if (p1.length < 8) { showToast('Le mot de passe doit faire au moins 8 caractères !', 'error'); return; }
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.textContent = '⏳ Sauvegarde...'; btn.disabled = true;
-  const ok = await DataManager.changeAdminPassword(oldPwd, p1);
-  if (ok) {
-    showToast('✅ Mot de passe changé avec succès !');
-    e.target.reset();
-  } else {
-    showToast('❌ Ancien mot de passe incorrect !', 'error');
-  }
-  btn.textContent = 'Changer le mot de passe'; btn.disabled = false;
+  localStorage.setItem('ptm_admin_pwd', p1);
+  showToast('✅ Mot de passe changé !');
+  e.target.reset();
 }
 
 function resetData() {
