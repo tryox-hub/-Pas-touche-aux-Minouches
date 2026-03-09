@@ -62,7 +62,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .logo-icon { font-size: 2rem; }
 .logo-title { display: block; font-size: 0.95rem; line-height: 1.2; color: var(--brown); }
 .logo-bold { font-size: 1.2rem; font-weight: 700; color: var(--coral); }
-.nav-links { display: flex; list-style: none; gap: 0.25rem; margin-left: auto; }
+.nav-links { display: none; list-style: none; gap: 0.25rem; margin-left: auto; }
 .nav-links a {
   padding: 0.5rem 1rem; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem;
   color: var(--brown-soft); transition: var(--transition);
@@ -613,4 +613,6 @@ textarea.form-control { min-height: 100px; resize: vertical; }
   .hero-stats { flex-direction: column; gap: 1rem; text-align: center; }
   .stat-sep { display: none; }
   .don-card-featured { margin-top: 1.5rem; }
+  .nav-links { display: flex; }
+  .nav-burger { display: none; }
 }
