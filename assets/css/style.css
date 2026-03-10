@@ -1,5 +1,5 @@
 /* =============================================
-   STYLE.CSS â€” Pas touche aux Minouches
+   STYLE.CSS — Pas touche aux Minouches
    Design scrapbook / kawaii chaleureux
    ============================================= */
 
@@ -414,4 +414,4 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
   width: 100%; padding: 0.7rem 1rem;
   border: 2px solid var(--cream-dark); border-radius: var(--radius);
   font-family: var(--font-body); font-size: 0.95rem; color: var(--brown);
-  background: var(--cream); outline: none
+  background: var(--cream); outline: none; 
