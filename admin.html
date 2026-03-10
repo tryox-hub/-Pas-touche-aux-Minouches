@@ -50,6 +50,9 @@
       <button class="admin-nav-item" onclick="showSection('stats')" id="navStats">
         <span class="nav-icon">📊</span> Statistiques
       </button>
+      <button class="admin-nav-item" onclick="showSection('messages')" id="navMessages">
+        <span class="nav-icon">💬</span> Messages contact
+      </button>
       <button class="admin-nav-item" onclick="showSection('settings')" id="navSettings">
         <span class="nav-icon">⚙️</span> Paramètres
       </button>
@@ -63,6 +66,7 @@
   <!-- Main -->
   <main class="admin-main">
     <header class="admin-header">
+      <button class="admin-menu-btn" onclick="document.querySelector('.admin-layout').classList.toggle('sidebar-open')" style="display:none;background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;font-size:1.4rem;margin-right:0.5rem;">☰</button>
       <h2 id="adminTitle">🐾 Chats & Chatons</h2>
       <div style="display:flex;align-items:center;gap:1rem;">
         <div id="headerActions"></div>
@@ -133,6 +137,31 @@
                 </tr>
               </thead>
               <tbody id="appsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================== MESSAGES SECTION ======================== -->
+      <div id="sectionMessages" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>💬 Messages reçus via le formulaire contact</h3>
+            <div style="font-size:0.85rem;color:var(--brown-soft);" id="msgsCount"></div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Expéditeur</th>
+                  <th>Email</th>
+                  <th>Sujet</th>
+                  <th>Date</th>
+                  <th>Statut</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="msgsTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -314,13 +343,15 @@ if (DataManager.isAdmin()) {
 
 // ---- SECTIONS ----
 function showSection(name) {
-  ['cats','applications','stats','settings'].forEach(s => {
+  document.querySelector('.admin-layout').classList.remove('sidebar-open');
+  ['cats','applications','messages','stats','settings'].forEach(s => {
     document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1)).style.display = s === name ? 'block' : 'none';
     document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('active', s === name);
   });
-  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
+  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
   document.getElementById('adminTitle').textContent = titles[name] || '';
   if (name === 'applications') renderAppsTable();
+  if (name === 'messages') renderMsgsTable();
   if (name === 'stats') loadStatsForm();
 }
 
@@ -563,6 +594,53 @@ async function changePwd(e) {
     showToast('❌ Ancien mot de passe incorrect !', 'error');
   }
   btn.textContent = 'Changer le mot de passe'; btn.disabled = false;
+}
+
+async function renderMsgsTable() {
+  document.getElementById('msgsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</td></tr>';
+  const msgs = await DataManager.getMessages();
+  document.getElementById('msgsCount').textContent = `${msgs.length} message(s)`;
+  const subjects = { adoption: 'Adoption', signalement: 'Signalement', accueil: 'Famille accueil', benevole: 'Bénévolat', don: 'Don', autre: 'Autre' };
+  document.getElementById('msgsTableBody').innerHTML = msgs.length ? msgs.map(m => `
+    <tr>
+      <td><strong>${m.first_name} ${m.last_name}</strong></td>
+      <td><a href="mailto:${m.email}" style="color:var(--coral);">${m.email}</a></td>
+      <td>${subjects[m.subject] || m.subject || '—'}</td>
+      <td>${m.date ? new Date(m.date).toLocaleDateString('fr-FR') : '—'}</td>
+      <td>${m.status === 'unread' ? '<span class="tag-pending">🔵 Non lu</span>' : '<span class="tag-adopted">✅ Lu</span>'}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="viewMsg('${m.id}')">👁️ Voir</button>
+        <button class="btn-edit" onclick="markRead('${m.id}')" style="background:#e8f8e8;color:var(--green);">✅ Lu</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucun message pour le moment.</td></tr>';
+}
+
+async function viewMsg(id) {
+  const msgs = await DataManager.getMessages();
+  const m = msgs.find(x => x.id === id);
+  if (!m) return;
+  await DataManager.updateMessage(id, { status: 'read' });
+  document.getElementById('appModalContent').innerHTML = `
+    <div style="display:grid;gap:0.75rem;font-size:0.9rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div><strong>De :</strong> ${m.first_name} ${m.last_name}</div>
+        <div><strong>Email :</strong> <a href="mailto:${m.email}" style="color:var(--coral);">${m.email}</a></div>
+      </div>
+      <div><strong>Sujet :</strong> ${m.subject || '—'}</div>
+      <hr style="border-color:var(--cream-dark);"/>
+      <div style="background:var(--cream);padding:1rem;border-radius:var(--radius);line-height:1.7;">${(m.message || '').replace(/\n/g,'<br/>')}</div>
+      <div style="display:flex;justify-content:flex-end;gap:1rem;margin-top:0.5rem;">
+        <a href="mailto:${m.email}" class="btn-primary btn-sm">📧 Répondre par email</a>
+        <button class="btn-outline btn-sm" onclick="closeModal('appModal')">Fermer</button>
+      </div>
+    </div>`;
+  openModal('appModal');
+  await renderMsgsTable();
+}
+
+async function markRead(id) {
+  await DataManager.updateMessage(id, { status: 'read' });
+  await renderMsgsTable();
 }
 
 function resetData() {
