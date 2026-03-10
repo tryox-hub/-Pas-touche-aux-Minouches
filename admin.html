@@ -345,8 +345,10 @@ if (DataManager.isAdmin()) {
 function showSection(name) {
   document.querySelector('.admin-layout').classList.remove('sidebar-open');
   ['cats','applications','messages','stats','settings'].forEach(s => {
-    document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1)).style.display = s === name ? 'block' : 'none';
-    document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('active', s === name);
+    const sec = document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1));
+    const nav = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
+    if (sec) sec.style.display = s === name ? 'block' : 'none';
+    if (nav) nav.classList.toggle('active', s === name);
   });
   const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
   document.getElementById('adminTitle').textContent = titles[name] || '';
