@@ -62,14 +62,15 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .logo-icon { font-size: 2rem; }
 .logo-title { display: block; font-size: 0.95rem; line-height: 1.2; color: var(--brown); }
 .logo-bold { font-size: 1.2rem; font-weight: 700; color: var(--coral); }
-.nav-links { display: flex; list-style: none; gap: 0.25rem; margin-left: auto; }
+/* NAV - mobile first */
+.nav-links { display: none; list-style: none; gap: 0.25rem; margin-left: auto; }
 .nav-links a {
   padding: 0.5rem 1rem; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem;
   color: var(--brown-soft); transition: var(--transition);
 }
 .nav-links a:hover, .nav-links a.active { background: var(--coral-light); color: var(--coral); }
 .nav-burger {
-  display: none; flex-direction: column; gap: 5px; background: none; border: none;
+  display: flex; flex-direction: column; gap: 5px; background: none; border: none;
   cursor: pointer; padding: 8px; border-radius: 8px;
 }
 .nav-burger span { display: block; width: 22px; height: 2px; background: var(--brown); border-radius: 2px; transition: var(--transition); }
@@ -413,4 +414,4 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
   width: 100%; padding: 0.7rem 1rem;
   border: 2px solid var(--cream-dark); border-radius: var(--radius);
   font-family: var(--font-body); font-size: 0.95rem; color: var(--brown);
-  background: var(--cream); outline: none; transition: var(--trans
+  background: var(--cream); outline: none
