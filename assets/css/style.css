@@ -601,6 +601,8 @@ textarea.form-control { min-height: 100px; resize: vertical; }
   .footer-inner { grid-template-columns: 1fr; }
   .admin-sidebar { display: none; }
   .admin-layout.sidebar-open .admin-sidebar { display: flex; position: fixed; inset: 0 auto 0 0; z-index: 100; width: 250px; }
+  .admin-menu-btn { display: flex !important; }
+  .admin-layout.sidebar-open::before { content: ''; position: fixed; inset: 0; background: rgba(92,64,51,0.4); z-index: 99; }
 
   /* Menu mobile */
   .nav-burger { display: flex; margin-left: auto; }
