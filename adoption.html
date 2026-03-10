@@ -153,6 +153,9 @@
     </div>
 
     <div class="form-actions">
+      <div style="background:var(--cream-dark);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--brown-soft);border-left:3px solid var(--coral);">
+        🔒 <strong>Vos données personnelles</strong> (nom, email, téléphone, adresse) sont collectées uniquement pour traiter votre demande d'adoption. Elles ne seront jamais transmises à des tiers ni utilisées à des fins commerciales. Conformément au RGPD, vous pouvez demander leur suppression à tout moment en nous contactant. Voir nos <a href="mentions-legales.html" style="color:var(--coral);text-decoration:underline;">Mentions légales</a>.
+      </div>
       <button type="submit" class="btn-primary btn-large">💌 Envoyer ma demande d'adoption →</button>
     </div>
   </form>
@@ -230,8 +233,7 @@ async function handleAdoption(e) {
 
   await DataManager.addApplication(app);
 
-  // Mark cat as pending if selected
-  if (app.catId) await DataManager.updateCat(app.catId, { status: 'pending' });
+  // Le chat reste "disponible" même après une demande
 
   form.style.display = 'none';
   document.getElementById('successMsg').style.display = 'block';
