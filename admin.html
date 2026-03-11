@@ -274,6 +274,23 @@
         </div>
         <input type="text" class="form-control" id="catHealthNote" placeholder="Note santé particulière..." style="margin-top:0.75rem;"/>
       </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:700;font-size:0.85rem;color:var(--brown);display:block;margin-bottom:0.75rem;">Compatibilités 🏠</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkChildren"/> OK avec enfants</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkDogs"/> OK avec chiens</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkCats"/> OK avec autres chats</label>
+        </div>
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:700;font-size:0.85rem;color:var(--brown);display:block;margin-bottom:0.75rem;">Logement & sortie 🌿</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkApartment"/> Convient en appartement</label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catNeedsOutdoor"/> Sortie extérieure souhaitée</label>
+        </div>
+      </div>
       <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem;">
         <button type="button" class="btn-outline" onclick="closeModal('catModal')">Annuler</button>
         <button type="submit" class="btn-primary">💾 Sauvegarder</button>
@@ -436,6 +453,11 @@ async function openEditCat(id) {
   document.getElementById('catSteri').checked      = cat.health?.sterilized || false;
   document.getElementById('catPuce').checked       = cat.health?.microchipped || false;
   document.getElementById('catHealthNote').value   = cat.health?.note || '';
+  document.getElementById('catOkChildren').checked  = cat.okChildren || false;
+  document.getElementById('catOkDogs').checked      = cat.okDogs || false;
+  document.getElementById('catOkCats').checked      = cat.okCats || false;
+  document.getElementById('catOkApartment').checked = cat.okApartment || false;
+  document.getElementById('catNeedsOutdoor').checked= cat.needsOutdoor || false;
   openModal('catModal');
 }
 
@@ -464,7 +486,12 @@ async function saveCat(e) {
       sterilized:   document.getElementById('catSteri').checked,
       microchipped: document.getElementById('catPuce').checked,
       note:         document.getElementById('catHealthNote').value.trim()
-    }
+    },
+    okChildren:   document.getElementById('catOkChildren').checked,
+    okDogs:       document.getElementById('catOkDogs').checked,
+    okCats:       document.getElementById('catOkCats').checked,
+    okApartment:  document.getElementById('catOkApartment').checked,
+    needsOutdoor: document.getElementById('catNeedsOutdoor').checked
   };
 
   try {
