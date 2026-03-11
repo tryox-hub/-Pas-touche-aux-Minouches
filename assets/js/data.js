@@ -1,20 +1,6 @@
-// =============================================
-// DATA.JS — Gestionnaire de données Supabase
-// =============================================
-//
-// ╔══════════════════════════════════════════╗
-// ║         CONFIGURATION SUPABASE           ║
-// ║                                          ║
-// ║  1. Allez sur https://supabase.com       ║
-// ║  2. Créez un compte gratuit              ║
-// ║  3. "New project" → nommez-le            ║
-// ║  4. Allez dans Settings > API            ║
-// ║  5. Copiez "Project URL" et "anon key"   ║
-// ║  6. Collez-les ci-dessous                ║
-// ╚══════════════════════════════════════════╝
 
-const SUPABASE_URL = 'https://hsmwrcrdwmfgufesufpl.supabase.co';        // ex: https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_4mKjCFhjwt9SRf3U19afow_GhEGr9JH';       // ex: eyJhbGci...
+const SUPABASE_URL = 'https://hsmwrcrdwmfgufesufpl.supabase.co';        
+const SUPABASE_ANON_KEY = 'sb_publishable_4mKjCFhjwt9SRf3U19afow_GhEGr9JH';     
 
 // =============================================
 // SCRIPT SQL À EXÉCUTER dans Supabase
@@ -244,7 +230,12 @@ function dbToJs(row) {
       microchipped: row.health_microchipped || false,
       note: row.health_note || ''
     },
-    dateAdded: row.date_added || ''
+    dateAdded: row.date_added || '',
+    okChildren:   row.ok_children || false,
+    okDogs:       row.ok_dogs || false,
+    okCats:       row.ok_cats || false,
+    okApartment:  row.ok_apartment || false,
+    needsOutdoor: row.needs_outdoor || false
   };
 }
 
@@ -268,6 +259,11 @@ function jsToDb(cat) {
     health_sterilized: cat.health?.sterilized || false,
     health_microchipped: cat.health?.microchipped || false,
     health_note: cat.health?.note || '',
+    ok_children:   cat.okChildren || false,
+    ok_dogs:       cat.okDogs || false,
+    ok_cats:       cat.okCats || false,
+    ok_apartment:  cat.okApartment || false,
+    needs_outdoor: cat.needsOutdoor || false,
     date_added: cat.dateAdded || new Date().toISOString().split('T')[0]
   };
 }
@@ -420,10 +416,9 @@ const DataManager = {
     }
   },
 
-  // Vérifie le mot de passe via Supabase — le mot de passe ne circule jamais en clair
+  // Vérifie le mot de passe via Supabase RPC (le mot de passe ne circule jamais en clair)
   async loginAdmin(pwd) {
     if (!SUPABASE_READY) {
-      // Fallback si Supabase non configuré
       const ok = pwd === 'Minouches2024!';
       if (ok) this._setAdminSession();
       return ok;
@@ -431,42 +426,30 @@ const DataManager = {
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_admin_password`, {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ input_password: pwd })
       });
       const ok = await res.json();
       if (ok) this._setAdminSession();
       return ok;
     } catch(e) {
-      console.error('Erreur login:', e);
       const ok = pwd === 'Minouches2024!';
       if (ok) this._setAdminSession();
       return ok;
     }
   },
 
-  // Change le mot de passe via Supabase
+  // Change le mot de passe via Supabase RPC
   async changeAdminPassword(oldPwd, newPwd) {
     if (!SUPABASE_READY) return false;
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/update_admin_password`, {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ old_password: oldPwd, new_password: newPwd })
       });
       return await res.json();
-    } catch(e) {
-      console.error('Erreur changement mot de passe:', e);
-      return false;
-    }
+    } catch(e) { return false; }
   },
 
   // Session temporaire 8h — ne contient PAS le mot de passe
@@ -477,6 +460,19 @@ const DataManager = {
   },
 
   logoutAdmin() { localStorage.removeItem('ptm_admin_session'); },
+
+  // ---- MESSAGES CONTACT ----
+  async getMessages() {
+    if (!SUPABASE_READY) return [];
+    try {
+      return await sb.query('messages', { order: 'date.desc' });
+    } catch(e) { return []; }
+  },
+
+  async updateMessage(id, data) {
+    if (!SUPABASE_READY) return;
+    await sb.update('messages', data, `id=eq.${id}`);
+  },
 
   isConfigured() { return SUPABASE_READY; }
 };
