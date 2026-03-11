@@ -44,7 +44,7 @@
       <div class="footer-col"><a href="chats.html">← Retour aux chats</a></div>
     </div>
   </div>
-  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span></div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span> · <a href="mentions-legales.html" style="opacity:0.6;font-size:0.85rem;">Mentions légales</a></div>
 </footer>
 
 <script src="assets/js/data.js"></script>
@@ -123,6 +123,16 @@ async function renderProfil() {
               </div>
             `).join('')}
             ${cat.health?.note ? `<p style="font-size:0.8rem;color:var(--brown-soft);margin-top:0.75rem;background:var(--cream-dark);padding:0.5rem;border-radius:0.5rem;">ℹ️ ${cat.health.note}</p>` : ''}
+          </div>
+
+          <!-- Compatibilités -->
+          <div class="profil-card">
+            <h3>🏠 Compatibilités</h3>
+            <div class="profil-health-item"><span class="${cat.okChildren ? 'health-ok' : 'health-no'}">${cat.okChildren ? '✅' : '❌'}</span> Avec enfants</div>
+            <div class="profil-health-item"><span class="${cat.okDogs ? 'health-ok' : 'health-no'}">${cat.okDogs ? '✅' : '❌'}</span> Avec chiens</div>
+            <div class="profil-health-item"><span class="${cat.okCats ? 'health-ok' : 'health-no'}">${cat.okCats ? '✅' : '❌'}</span> Avec autres chats</div>
+            <div class="profil-health-item"><span class="${cat.okApartment ? 'health-ok' : 'health-no'}">${cat.okApartment ? '✅' : '❌'}</span> Convient en appartement</div>
+            <div class="profil-health-item"><span class="${cat.needsOutdoor ? 'health-ok' : 'health-no'}">${cat.needsOutdoor ? '✅' : '❌'}</span> Sortie extérieure souhaitée</div>
           </div>
 
           <!-- Caractère -->
