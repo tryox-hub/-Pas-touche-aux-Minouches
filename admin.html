@@ -259,7 +259,21 @@
           </select>
         </div>
       </div>
-      <div class="form-group"><label>URL de la photo principale</label><input type="url" class="form-control" id="catImg" placeholder="https://..."/></div>
+      <div class="form-group">
+        <label>Photo principale</label>
+        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
+          <label for="catImgFile" id="uploadBtn" style="cursor:pointer;background:var(--coral);color:white;padding:0.5rem 1rem;border-radius:0.75rem;font-size:0.9rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;">
+            📁 Choisir une photo
+          </label>
+          <input type="file" id="catImgFile" accept="image/*" style="display:none;" onchange="handleImgUpload(this)"/>
+          <span id="uploadStatus" style="font-size:0.85rem;color:var(--brown-soft);"></span>
+        </div>
+        <div id="imgPreviewWrap" style="display:none;margin-bottom:0.5rem;">
+          <img id="imgPreview" style="max-width:120px;max-height:120px;border-radius:0.75rem;object-fit:cover;border:2px solid var(--coral);"/>
+        </div>
+        <input type="url" class="form-control" id="catImg" placeholder="https://... (ou utilise le bouton ci-dessus)" style="font-size:0.8rem;"/>
+        <p style="font-size:0.75rem;color:var(--brown-soft);margin-top:0.25rem;">Tu peux aussi coller un lien direct si tu préfères.</p>
+      </div>
       <div class="form-group">
         <label>Description</label>
         <textarea class="form-control" id="catDesc" rows="3" placeholder="Décrivez le caractère et l'histoire de ce minouche..."></textarea>
@@ -447,6 +461,13 @@ async function openEditCat(id) {
   document.getElementById('catStatus').value       = cat.status || 'available';
   document.getElementById('catIsKitten').value     = cat.isKitten ? 'true' : 'false';
   document.getElementById('catImg').value          = cat.img || '';
+  if (cat.img) {
+    document.getElementById('imgPreview').src = cat.img;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+  } else {
+    document.getElementById('imgPreviewWrap').style.display = 'none';
+  }
+  document.getElementById('uploadStatus').textContent = '';
   document.getElementById('catDesc').value         = cat.description || '';
   document.getElementById('catTraits').value       = (cat.traits || []).join(', ');
   document.getElementById('catVax').checked        = cat.health?.vaccinated || false;
@@ -545,6 +566,7 @@ async function renderAppsTable() {
         <button class="btn-edit" onclick="viewApp('${app.id}')">👁️ Voir</button>
         <button class="btn-edit" onclick="updateApp('${app.id}','approved')" style="background:#e8f8e8;color:var(--green);">✅</button>
         <button class="btn-del"  onclick="updateApp('${app.id}','rejected')">❌</button>
+        <button class="btn-del"  onclick="deleteApp('${app.id}')" title="Supprimer définitivement">🗑️</button>
       </div></td>
     </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucune demande pour le moment.</td></tr>';
 }
@@ -572,9 +594,47 @@ async function viewApp(id) {
       <div style="display:flex;gap:1rem;margin-top:0.5rem;justify-content:flex-end;">
         <button class="btn-primary btn-success btn-sm" onclick="updateApp('${app.id}','approved');closeModal('appModal')">✅ Approuver</button>
         <button class="btn-primary btn-danger btn-sm"  onclick="updateApp('${app.id}','rejected');closeModal('appModal')">❌ Refuser</button>
+        <button class="btn-outline btn-sm" onclick="deleteApp('${app.id}');closeModal('appModal')" style="color:#e74c3c;border-color:#e74c3c;">🗑️ Supprimer</button>
       </div>
     </div>`;
   openModal('appModal');
+}
+
+async function handleImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('uploadStatus');
+  const preview = document.getElementById('imgPreview');
+  const previewWrap = document.getElementById('imgPreviewWrap');
+
+  // Aperçu local immédiat
+  const reader = new FileReader();
+  reader.onload = e => {
+    preview.src = e.target.result;
+    previewWrap.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+
+  status.textContent = '⏳ Upload en cours...';
+  status.style.color = 'var(--brown-soft)';
+
+  try {
+    const url = await sb.uploadImage(file);
+    document.getElementById('catImg').value = url;
+    status.textContent = '✅ Photo uploadée !';
+    status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = '#e74c3c';
+    previewWrap.style.display = 'none';
+  }
+}
+
+async function deleteApp(id) {
+  if (!confirm('Supprimer définitivement cette demande ? Les données personnelles seront effacées.')) return;
+  await DataManager.deleteApplication(id);
+  await renderAppsTable();
+  showToast('🗑️ Demande supprimée', 'info');
 }
 
 async function updateApp(id, status) {
