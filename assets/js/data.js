@@ -204,6 +204,29 @@ const sb = {
     });
     if (!res.ok) throw new Error(await res.text());
     return true;
+  },
+
+  async uploadImage(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const allowed = ['jpg','jpeg','png','webp','gif'];
+    if (!allowed.includes(ext)) throw new Error('Format non supporté. Utilisez JPG, PNG ou WEBP.');
+    if (file.size > 5 * 1024 * 1024) throw new Error('Image trop lourde (max 5 Mo).');
+    const filename = `cats/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/photos/${filename}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': file.type,
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error('Erreur upload: ' + err);
+    }
+    return `${SUPABASE_URL}/storage/v1/object/public/photos/${filename}`;
   }
 };
 
@@ -395,6 +418,16 @@ const DataManager = {
   async updateApplication(id, data) {
     if (!SUPABASE_READY) return;
     await sb.update('applications', data, `id=eq.${id}`);
+  },
+
+  async deleteApplication(id) {
+    if (!SUPABASE_READY) return;
+    await sb.remove('applications', `id=eq.${id}`);
+  },
+
+  async deleteMessage(id) {
+    if (!SUPABASE_READY) return;
+    await sb.remove('messages', `id=eq.${id}`);
   },
 
   // ---- ADMIN AUTH (sécurisé via Supabase) ----
