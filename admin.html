@@ -53,6 +53,9 @@
       <button class="admin-nav-item" onclick="showSection('messages')" id="navMessages">
         <span class="nav-icon">💬</span> Messages contact
       </button>
+      <button class="admin-nav-item" onclick="showSection('history')" id="navHistory">
+        <span class="nav-icon">📜</span> Historique
+      </button>
       <button class="admin-nav-item" onclick="showSection('settings')" id="navSettings">
         <span class="nav-icon">⚙️</span> Paramètres
       </button>
@@ -139,6 +142,26 @@
               <tbody id="appsTableBody"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ======================== HISTORY SECTION ======================== -->
+      <div id="sectionHistory" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📜 Historique des minouches</h3>
+            <div style="font-size:0.85rem;color:var(--brown-soft);" id="historyCount"></div>
+          </div>
+          <div style="margin-bottom:1rem;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+            <input type="text" class="form-control" id="historySearch" placeholder="🔍 Rechercher un nom..." oninput="filterHistory()" style="max-width:280px;"/>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('all')"   id="hFilterAll"      style="background:var(--coral);color:white;">Tous</button>
+              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('available')" id="hFilterAvailable">Disponibles</button>
+              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('pending')"   id="hFilterPending">En cours</button>
+              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('adopted')"   id="hFilterAdopted">Adoptés</button>
+            </div>
+          </div>
+          <div id="historyGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;"></div>
         </div>
       </div>
 
@@ -375,17 +398,81 @@ if (DataManager.isAdmin()) {
 // ---- SECTIONS ----
 function showSection(name) {
   document.querySelector('.admin-layout').classList.remove('sidebar-open');
-  ['cats','applications','messages','stats','settings'].forEach(s => {
+  ['cats','applications','messages','stats','settings','history'].forEach(s => {
     const sec = document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1));
     const nav = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
     if (sec) sec.style.display = s === name ? 'block' : 'none';
     if (nav) nav.classList.toggle('active', s === name);
   });
-  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
+  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres', history: '📜 Historique des minouches' };
   document.getElementById('adminTitle').textContent = titles[name] || '';
   if (name === 'applications') renderAppsTable();
   if (name === 'messages') renderMsgsTable();
   if (name === 'stats') loadStatsForm();
+  if (name === 'history') renderHistory();
+}
+
+// ---- HISTORY ----
+let _historyAllCats = [];
+let _historyStatusFilter = 'all';
+
+async function renderHistory() {
+  const grid = document.getElementById('historyGrid');
+  const countEl = document.getElementById('historyCount');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</div>';
+
+  const cats = await DataManager.getCats();
+  _historyAllCats = [...cats].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+
+  countEl.textContent = `${_historyAllCats.length} minouche${_historyAllCats.length > 1 ? 's' : ''} au total`;
+  renderHistoryGrid();
+}
+
+function filterHistory() {
+  renderHistoryGrid();
+}
+
+function filterHistoryStatus(status) {
+  _historyStatusFilter = status;
+  ['all','available','pending','adopted'].forEach(s => {
+    const btn = document.getElementById('hFilter' + s.charAt(0).toUpperCase() + s.slice(1));
+    if (btn) btn.style.background = s === status ? 'var(--coral)' : '';
+    if (btn) btn.style.color = s === status ? 'white' : '';
+  });
+  renderHistoryGrid();
+}
+
+function renderHistoryGrid() {
+  const grid = document.getElementById('historyGrid');
+  const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
+  const statusLabels = { available: '✅ Disponible', pending: '⏳ En cours', adopted: '🏠 Adopté' };
+  const statusColors = { available: '#27ae60', pending: '#e67e22', adopted: '#8e44ad' };
+
+  let filtered = _historyAllCats;
+  if (_historyStatusFilter !== 'all') filtered = filtered.filter(c => c.status === _historyStatusFilter);
+  if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || (c.nickname||'').toLowerCase().includes(search));
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--brown-soft);">Aucun minouche trouvé 🐱</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(cat => `
+    <div style="background:var(--cream);border-radius:var(--radius);padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;text-align:center;border:2px solid var(--cream-dark);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(92,64,51,0.12)'" onmouseout="this.style.boxShadow=''">
+      ${cat.img
+        ? `<img src="${cat.img}" alt="${cat.name}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--coral);"/>`
+        : `<div style="width:70px;height:70px;border-radius:50%;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;font-size:2rem;">🐱</div>`
+      }
+      <div style="font-weight:700;color:var(--brown);font-size:1rem;">${cat.name}</div>
+      ${cat.nickname ? `<div style="font-size:0.8rem;color:var(--brown-soft);font-style:italic;">« ${cat.nickname} »</div>` : ''}
+      <div style="font-size:0.78rem;color:var(--brown-soft);">${cat.breed || ''} · ${cat.sex === 'M' ? '♂' : '♀'}</div>
+      <span style="font-size:0.75rem;font-weight:700;color:${statusColors[cat.status]||'#666'};background:${statusColors[cat.status]||'#666'}22;padding:0.2rem 0.6rem;border-radius:1rem;">${statusLabels[cat.status]||cat.status}</span>
+      <div style="display:flex;gap:0.4rem;margin-top:0.25rem;">
+        <a href="profil-chat.html?id=${cat.id}" target="_blank" class="btn-edit" style="font-size:0.75rem;padding:0.25rem 0.6rem;">👁️</a>
+        <button class="btn-edit" onclick="openEditCat('${cat.id}')" style="font-size:0.75rem;padding:0.25rem 0.6rem;">✏️</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 // ---- STATS BAR ----
