@@ -152,16 +152,12 @@
             <h3>📜 Historique des minouches</h3>
             <div style="font-size:0.85rem;color:var(--brown-soft);" id="historyCount"></div>
           </div>
-          <div style="margin-bottom:1rem;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
-            <input type="text" class="form-control" id="historySearch" placeholder="🔍 Rechercher un nom..." oninput="filterHistory()" style="max-width:280px;"/>
-            <div style="display:flex;gap:0.5rem;">
-              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('all')"   id="hFilterAll"      style="background:var(--coral);color:white;">Tous</button>
-              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('available')" id="hFilterAvailable">Disponibles</button>
-              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('pending')"   id="hFilterPending">En cours</button>
-              <button class="btn-outline btn-sm" onclick="filterHistoryStatus('adopted')"   id="hFilterAdopted">Adoptés</button>
-            </div>
+          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <input type="text" class="form-control" id="historyNewName" placeholder="Ajouter un nom..." style="max-width:220px;" onkeydown="if(event.key==='Enter')addHistoryName()"/>
+            <button class="btn-primary btn-sm" onclick="addHistoryName()">➕ Ajouter</button>
+            <input type="text" class="form-control" id="historySearch" placeholder="🔍 Rechercher..." oninput="renderHistoryList()" style="max-width:200px;margin-left:auto;"/>
           </div>
-          <div id="historyGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;"></div>
+          <div id="historyList" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
         </div>
       </div>
 
@@ -413,66 +409,65 @@ function showSection(name) {
 }
 
 // ---- HISTORY ----
-let _historyAllCats = [];
-let _historyStatusFilter = 'all';
+let _historyNames = [];
 
 async function renderHistory() {
-  const grid = document.getElementById('historyGrid');
+  const list = document.getElementById('historyList');
   const countEl = document.getElementById('historyCount');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</div>';
-
-  const cats = await DataManager.getCats();
-  _historyAllCats = [...cats].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-
-  countEl.textContent = `${_historyAllCats.length} minouche${_historyAllCats.length > 1 ? 's' : ''} au total`;
-  renderHistoryGrid();
+  list.innerHTML = '<span style="color:var(--brown-soft);">⏳ Chargement...</span>';
+  try {
+    const rows = await sb.query('history_names', { order: 'name.asc' });
+    _historyNames = rows;
+    countEl.textContent = `${rows.length} minouche${rows.length > 1 ? 's' : ''} au total`;
+    renderHistoryList();
+  } catch(e) {
+    list.innerHTML = '<span style="color:#e74c3c;">❌ Erreur — table history_names manquante dans Supabase ?</span>';
+  }
 }
 
-function filterHistory() {
-  renderHistoryGrid();
-}
-
-function filterHistoryStatus(status) {
-  _historyStatusFilter = status;
-  ['all','available','pending','adopted'].forEach(s => {
-    const btn = document.getElementById('hFilter' + s.charAt(0).toUpperCase() + s.slice(1));
-    if (btn) btn.style.background = s === status ? 'var(--coral)' : '';
-    if (btn) btn.style.color = s === status ? 'white' : '';
-  });
-  renderHistoryGrid();
-}
-
-function renderHistoryGrid() {
-  const grid = document.getElementById('historyGrid');
+function renderHistoryList() {
+  const list = document.getElementById('historyList');
   const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
-  const statusLabels = { available: '✅ Disponible', pending: '⏳ En cours', adopted: '🏠 Adopté' };
-  const statusColors = { available: '#27ae60', pending: '#e67e22', adopted: '#8e44ad' };
-
-  let filtered = _historyAllCats;
-  if (_historyStatusFilter !== 'all') filtered = filtered.filter(c => c.status === _historyStatusFilter);
-  if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || (c.nickname||'').toLowerCase().includes(search));
+  const filtered = _historyNames.filter(n => n.name.toLowerCase().includes(search));
 
   if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--brown-soft);">Aucun minouche trouvé 🐱</div>';
+    list.innerHTML = '<span style="color:var(--brown-soft);">Aucun nom trouvé 🐱</span>';
     return;
   }
 
-  grid.innerHTML = filtered.map(cat => `
-    <div style="background:var(--cream);border-radius:var(--radius);padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;text-align:center;border:2px solid var(--cream-dark);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(92,64,51,0.12)'" onmouseout="this.style.boxShadow=''">
-      ${cat.img
-        ? `<img src="${cat.img}" alt="${cat.name}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--coral);"/>`
-        : `<div style="width:70px;height:70px;border-radius:50%;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;font-size:2rem;">🐱</div>`
-      }
-      <div style="font-weight:700;color:var(--brown);font-size:1rem;">${cat.name}</div>
-      ${cat.nickname ? `<div style="font-size:0.8rem;color:var(--brown-soft);font-style:italic;">« ${cat.nickname} »</div>` : ''}
-      <div style="font-size:0.78rem;color:var(--brown-soft);">${cat.breed || ''} · ${cat.sex === 'M' ? '♂' : '♀'}</div>
-      <span style="font-size:0.75rem;font-weight:700;color:${statusColors[cat.status]||'#666'};background:${statusColors[cat.status]||'#666'}22;padding:0.2rem 0.6rem;border-radius:1rem;">${statusLabels[cat.status]||cat.status}</span>
-      <div style="display:flex;gap:0.4rem;margin-top:0.25rem;">
-        <a href="profil-chat.html?id=${cat.id}" target="_blank" class="btn-edit" style="font-size:0.75rem;padding:0.25rem 0.6rem;">👁️</a>
-        <button class="btn-edit" onclick="openEditCat('${cat.id}')" style="font-size:0.75rem;padding:0.25rem 0.6rem;">✏️</button>
-      </div>
+  list.innerHTML = filtered.map(n => `
+    <div style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--cream-dark);border:1.5px solid var(--coral);border-radius:2rem;padding:0.3rem 0.75rem 0.3rem 1rem;font-size:0.9rem;font-weight:600;color:var(--brown);">
+      🐾 ${n.name}
+      <button onclick="deleteHistoryName('${n.id}','${n.name.replace(/'/g,"\'")}')" style="background:none;border:none;cursor:pointer;color:var(--brown-soft);font-size:1rem;padding:0;margin-left:0.25rem;line-height:1;" title="Supprimer">✕</button>
     </div>
   `).join('');
+}
+
+async function addHistoryName() {
+  const input = document.getElementById('historyNewName');
+  const name = input.value.trim();
+  if (!name) return;
+  if (_historyNames.some(n => n.name.toLowerCase() === name.toLowerCase())) {
+    showToast('Ce nom existe déjà !', 'error'); return;
+  }
+  try {
+    const id = 'hist-' + Date.now();
+    await sb.insert('history_names', { id, name });
+    input.value = '';
+    await renderHistory();
+    showToast('✅ ' + name + ' ajouté à l'historique');
+  } catch(e) {
+    showToast('❌ Erreur : ' + e.message, 'error');
+  }
+}
+
+async function deleteHistoryName(id, name) {
+  if (!confirm(`Supprimer "${name}" de l'historique ?`)) return;
+  await sb.remove('history_names', `id=eq.${id}`);
+  _historyNames = _historyNames.filter(n => n.id !== id);
+  document.getElementById('historyCount').textContent = `${_historyNames.length} minouche${_historyNames.length > 1 ? 's' : ''} au total`;
+  renderHistoryList();
+  showToast('🗑️ ' + name + ' supprimé', 'info');
 }
 
 // ---- STATS BAR ----
