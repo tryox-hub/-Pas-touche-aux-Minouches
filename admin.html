@@ -53,9 +53,6 @@
       <button class="admin-nav-item" onclick="showSection('messages')" id="navMessages">
         <span class="nav-icon">💬</span> Messages contact
       </button>
-      <button class="admin-nav-item" onclick="showSection('history')" id="navHistory">
-        <span class="nav-icon">📜</span> Historique
-      </button>
       <button class="admin-nav-item" onclick="showSection('settings')" id="navSettings">
         <span class="nav-icon">⚙️</span> Paramètres
       </button>
@@ -69,7 +66,6 @@
   <!-- Main -->
   <main class="admin-main">
     <header class="admin-header">
-      <button class="admin-menu-btn" onclick="document.querySelector('.admin-layout').classList.toggle('sidebar-open')" style="display:none;background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;font-size:1.4rem;margin-right:0.5rem;">☰</button>
       <h2 id="adminTitle">🐾 Chats & Chatons</h2>
       <div style="display:flex;align-items:center;gap:1rem;">
         <div id="headerActions"></div>
@@ -142,22 +138,6 @@
               <tbody id="appsTableBody"></tbody>
             </table>
           </div>
-        </div>
-      </div>
-
-      <!-- ======================== HISTORY SECTION ======================== -->
-      <div id="sectionHistory" style="display:none;">
-        <div class="admin-card">
-          <div class="admin-card-header">
-            <h3>📜 Historique des minouches</h3>
-            <div style="font-size:0.85rem;color:var(--brown-soft);" id="historyCount"></div>
-          </div>
-          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.25rem;">
-            <input type="text" class="form-control" id="historyNewName" placeholder="Ajouter un nom..." style="max-width:220px;" onkeydown="if(event.key==='Enter')addHistoryName()"/>
-            <button class="btn-primary btn-sm" onclick="addHistoryName()">➕ Ajouter</button>
-            <input type="text" class="form-control" id="historySearch" placeholder="🔍 Rechercher..." oninput="renderHistoryList()" style="max-width:200px;margin-left:auto;"/>
-          </div>
-          <div id="historyList" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
         </div>
       </div>
 
@@ -278,21 +258,7 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label>Photo principale</label>
-        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
-          <label for="catImgFile" id="uploadBtn" style="cursor:pointer;background:var(--coral);color:white;padding:0.5rem 1rem;border-radius:0.75rem;font-size:0.9rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;">
-            📁 Choisir une photo
-          </label>
-          <input type="file" id="catImgFile" accept="image/*" style="display:none;" onchange="handleImgUpload(this)"/>
-          <span id="uploadStatus" style="font-size:0.85rem;color:var(--brown-soft);"></span>
-        </div>
-        <div id="imgPreviewWrap" style="display:none;margin-bottom:0.5rem;">
-          <img id="imgPreview" style="max-width:120px;max-height:120px;border-radius:0.75rem;object-fit:cover;border:2px solid var(--coral);"/>
-        </div>
-        <input type="url" class="form-control" id="catImg" placeholder="https://... (ou utilise le bouton ci-dessus)" style="font-size:0.8rem;"/>
-        <p style="font-size:0.75rem;color:var(--brown-soft);margin-top:0.25rem;">Tu peux aussi coller un lien direct si tu préfères.</p>
-      </div>
+      <div class="form-group"><label>URL de la photo principale</label><input type="url" class="form-control" id="catImg" placeholder="https://..."/></div>
       <div class="form-group">
         <label>Description</label>
         <textarea class="form-control" id="catDesc" rows="3" placeholder="Décrivez le caractère et l'histoire de ce minouche..."></textarea>
@@ -306,23 +272,6 @@
           <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catPuce"/> Pucé(e)</label>
         </div>
         <input type="text" class="form-control" id="catHealthNote" placeholder="Note santé particulière..." style="margin-top:0.75rem;"/>
-      </div>
-
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:700;font-size:0.85rem;color:var(--brown);display:block;margin-bottom:0.75rem;">Compatibilités 🏠</label>
-        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkChildren"/> OK avec enfants</label>
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkDogs"/> OK avec chiens</label>
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkCats"/> OK avec autres chats</label>
-        </div>
-      </div>
-
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:700;font-size:0.85rem;color:var(--brown);display:block;margin-bottom:0.75rem;">Logement & sortie 🌿</label>
-        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catOkApartment"/> Convient en appartement</label>
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="catNeedsOutdoor"/> Sortie extérieure souhaitée</label>
-        </div>
       </div>
       <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem;">
         <button type="button" class="btn-outline" onclick="closeModal('catModal')">Annuler</button>
@@ -359,7 +308,7 @@ async function doLogin(e) {
     initAdmin();
   } else {
     document.getElementById('loginError').style.display = 'block';
-    btn.textContent = 'Connexion 🔓'; btn.disabled = false;
+    btn.textContent = 'Se connecter'; btn.disabled = false;
   }
 }
 
@@ -393,81 +342,15 @@ if (DataManager.isAdmin()) {
 
 // ---- SECTIONS ----
 function showSection(name) {
-  document.querySelector('.admin-layout').classList.remove('sidebar-open');
-  ['cats','applications','messages','stats','settings','history'].forEach(s => {
-    const sec = document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1));
-    const nav = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
-    if (sec) sec.style.display = s === name ? 'block' : 'none';
-    if (nav) nav.classList.toggle('active', s === name);
+  ['cats','applications','messages','stats','settings'].forEach(s => {
+    document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1)).style.display = s === name ? 'block' : 'none';
+    document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('active', s === name);
   });
-  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres', history: '📜 Historique des minouches' };
+  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres' };
   document.getElementById('adminTitle').textContent = titles[name] || '';
   if (name === 'applications') renderAppsTable();
   if (name === 'messages') renderMsgsTable();
   if (name === 'stats') loadStatsForm();
-  if (name === 'history') renderHistory();
-}
-
-// ---- HISTORY ----
-let _historyNames = [];
-
-async function renderHistory() {
-  const list = document.getElementById('historyList');
-  const countEl = document.getElementById('historyCount');
-  list.innerHTML = '<span style="color:var(--brown-soft);">⏳ Chargement...</span>';
-  try {
-    const rows = await sb.query('history_names', { order: 'name.asc' });
-    _historyNames = rows;
-    countEl.textContent = `${rows.length} minouche${rows.length > 1 ? 's' : ''} au total`;
-    renderHistoryList();
-  } catch(e) {
-    list.innerHTML = '<span style="color:#e74c3c;">❌ Erreur — table history_names manquante dans Supabase ?</span>';
-  }
-}
-
-function renderHistoryList() {
-  const list = document.getElementById('historyList');
-  const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
-  const filtered = _historyNames.filter(n => n.name.toLowerCase().includes(search));
-
-  if (!filtered.length) {
-    list.innerHTML = '<span style="color:var(--brown-soft);">Aucun nom trouvé 🐱</span>';
-    return;
-  }
-
-  list.innerHTML = filtered.map(n => `
-    <div style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--cream-dark);border:1.5px solid var(--coral);border-radius:2rem;padding:0.3rem 0.75rem 0.3rem 1rem;font-size:0.9rem;font-weight:600;color:var(--brown);">
-      🐾 ${n.name}
-      <button onclick="deleteHistoryName('${n.id}','${n.name.replace(/'/g,"\'")}')" style="background:none;border:none;cursor:pointer;color:var(--brown-soft);font-size:1rem;padding:0;margin-left:0.25rem;line-height:1;" title="Supprimer">✕</button>
-    </div>
-  `).join('');
-}
-
-async function addHistoryName() {
-  const input = document.getElementById('historyNewName');
-  const name = input.value.trim();
-  if (!name) return;
-  if (_historyNames.some(n => n.name.toLowerCase() === name.toLowerCase())) {
-    showToast('Ce nom existe déjà !', 'error'); return;
-  }
-  try {
-    const id = 'hist-' + Date.now();
-    await sb.insert('history_names', { id, name });
-    input.value = '';
-    await renderHistory();
-    showToast('✅ ' + name + ' ajouté à l'historique');
-  } catch(e) {
-    showToast('❌ Erreur : ' + e.message, 'error');
-  }
-}
-
-async function deleteHistoryName(id, name) {
-  if (!confirm(`Supprimer "${name}" de l'historique ?`)) return;
-  await sb.remove('history_names', `id=eq.${id}`);
-  _historyNames = _historyNames.filter(n => n.id !== id);
-  document.getElementById('historyCount').textContent = `${_historyNames.length} minouche${_historyNames.length > 1 ? 's' : ''} au total`;
-  renderHistoryList();
-  showToast('🗑️ ' + name + ' supprimé', 'info');
 }
 
 // ---- STATS BAR ----
@@ -543,24 +426,12 @@ async function openEditCat(id) {
   document.getElementById('catStatus').value       = cat.status || 'available';
   document.getElementById('catIsKitten').value     = cat.isKitten ? 'true' : 'false';
   document.getElementById('catImg').value          = cat.img || '';
-  if (cat.img) {
-    document.getElementById('imgPreview').src = cat.img;
-    document.getElementById('imgPreviewWrap').style.display = 'block';
-  } else {
-    document.getElementById('imgPreviewWrap').style.display = 'none';
-  }
-  document.getElementById('uploadStatus').textContent = '';
   document.getElementById('catDesc').value         = cat.description || '';
   document.getElementById('catTraits').value       = (cat.traits || []).join(', ');
   document.getElementById('catVax').checked        = cat.health?.vaccinated || false;
   document.getElementById('catSteri').checked      = cat.health?.sterilized || false;
   document.getElementById('catPuce').checked       = cat.health?.microchipped || false;
   document.getElementById('catHealthNote').value   = cat.health?.note || '';
-  document.getElementById('catOkChildren').checked  = cat.okChildren || false;
-  document.getElementById('catOkDogs').checked      = cat.okDogs || false;
-  document.getElementById('catOkCats').checked      = cat.okCats || false;
-  document.getElementById('catOkApartment').checked = cat.okApartment || false;
-  document.getElementById('catNeedsOutdoor').checked= cat.needsOutdoor || false;
   openModal('catModal');
 }
 
@@ -589,12 +460,7 @@ async function saveCat(e) {
       sterilized:   document.getElementById('catSteri').checked,
       microchipped: document.getElementById('catPuce').checked,
       note:         document.getElementById('catHealthNote').value.trim()
-    },
-    okChildren:   document.getElementById('catOkChildren').checked,
-    okDogs:       document.getElementById('catOkDogs').checked,
-    okCats:       document.getElementById('catOkCats').checked,
-    okApartment:  document.getElementById('catOkApartment').checked,
-    needsOutdoor: document.getElementById('catNeedsOutdoor').checked
+    }
   };
 
   try {
@@ -648,7 +514,6 @@ async function renderAppsTable() {
         <button class="btn-edit" onclick="viewApp('${app.id}')">👁️ Voir</button>
         <button class="btn-edit" onclick="updateApp('${app.id}','approved')" style="background:#e8f8e8;color:var(--green);">✅</button>
         <button class="btn-del"  onclick="updateApp('${app.id}','rejected')">❌</button>
-        <button class="btn-del"  onclick="deleteApp('${app.id}')" title="Supprimer définitivement">🗑️</button>
       </div></td>
     </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucune demande pour le moment.</td></tr>';
 }
@@ -676,47 +541,9 @@ async function viewApp(id) {
       <div style="display:flex;gap:1rem;margin-top:0.5rem;justify-content:flex-end;">
         <button class="btn-primary btn-success btn-sm" onclick="updateApp('${app.id}','approved');closeModal('appModal')">✅ Approuver</button>
         <button class="btn-primary btn-danger btn-sm"  onclick="updateApp('${app.id}','rejected');closeModal('appModal')">❌ Refuser</button>
-        <button class="btn-outline btn-sm" onclick="deleteApp('${app.id}');closeModal('appModal')" style="color:#e74c3c;border-color:#e74c3c;">🗑️ Supprimer</button>
       </div>
     </div>`;
   openModal('appModal');
-}
-
-async function handleImgUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('uploadStatus');
-  const preview = document.getElementById('imgPreview');
-  const previewWrap = document.getElementById('imgPreviewWrap');
-
-  // Aperçu local immédiat
-  const reader = new FileReader();
-  reader.onload = e => {
-    preview.src = e.target.result;
-    previewWrap.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-
-  status.textContent = '⏳ Upload en cours...';
-  status.style.color = 'var(--brown-soft)';
-
-  try {
-    const url = await sb.uploadImage(file);
-    document.getElementById('catImg').value = url;
-    status.textContent = '✅ Photo uploadée !';
-    status.style.color = 'var(--green)';
-  } catch(e) {
-    status.textContent = '❌ ' + e.message;
-    status.style.color = '#e74c3c';
-    previewWrap.style.display = 'none';
-  }
-}
-
-async function deleteApp(id) {
-  if (!confirm('Supprimer définitivement cette demande ? Les données personnelles seront effacées.')) return;
-  await DataManager.deleteApplication(id);
-  await renderAppsTable();
-  showToast('🗑️ Demande supprimée', 'info');
 }
 
 async function updateApp(id, status) {
