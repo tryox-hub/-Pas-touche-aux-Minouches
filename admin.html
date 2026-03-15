@@ -455,7 +455,7 @@ async function addHistoryName() {
     await sb.insert('history_names', { id, name });
     input.value = '';
     await renderHistory();
-    showToast('✅ ' + name + ' ajouté à l'historique');
+    showToast('✅ ' + name + ' ajouté à l\'historique');
   } catch(e) {
     showToast('❌ Erreur : ' + e.message, 'error');
   }
