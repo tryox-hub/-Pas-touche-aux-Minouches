@@ -157,7 +157,7 @@
             <button class="btn-primary btn-sm" onclick="addHistoryName()">➕ Ajouter</button>
             <input type="text" class="form-control" id="historySearch" placeholder="🔍 Rechercher..." oninput="renderHistoryList()" style="max-width:200px;margin-left:auto;"/>
           </div>
-          <div id="historyList" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+          <div id="historyList" style="display:flex;flex-direction:column;gap:0;"></div>
         </div>
       </div>
 
@@ -435,10 +435,25 @@ function renderHistoryList() {
     return;
   }
 
-  list.innerHTML = filtered.map(n => `
-    <div style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--cream-dark);border:1.5px solid var(--coral);border-radius:2rem;padding:0.3rem 0.75rem 0.3rem 1rem;font-size:0.9rem;font-weight:600;color:var(--brown);">
-      🐾 ${n.name}
-      <button onclick="deleteHistoryName('${n.id}','${n.name.replace(/'/g,"\'")}')" style="background:none;border:none;cursor:pointer;color:var(--brown-soft);font-size:1rem;padding:0;margin-left:0.25rem;line-height:1;" title="Supprimer">✕</button>
+  // Grouper par lettre
+  const groups = {};
+  filtered.forEach(n => {
+    const letter = n.name[0].toUpperCase();
+    if (!groups[letter]) groups[letter] = [];
+    groups[letter].push(n);
+  });
+
+  list.innerHTML = Object.keys(groups).sort().map(letter => `
+    <div style="width:100%;margin-bottom:0.75rem;">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--coral);letter-spacing:0.1em;margin-bottom:0.4rem;padding-bottom:0.25rem;border-bottom:1.5px solid var(--cream-dark);">${letter}</div>
+      <div style="display:flex;flex-direction:column;gap:0.25rem;">
+        ${groups[letter].map(n => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0.75rem;background:var(--cream);border-radius:0.5rem;border-left:3px solid var(--coral);">
+            <span style="font-weight:600;color:var(--brown);">🐾 ${n.name}</span>
+            <button onclick="deleteHistoryName('${n.id}','${n.name.replace(/'/g,"\'")}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem;padding:0.1rem 0.4rem;border-radius:0.3rem;transition:color 0.15s;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#ccc'" title="Supprimer">✕</button>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `).join('');
 }
@@ -603,6 +618,13 @@ async function saveCat(e) {
       showToast(`✅ ${cat.name} mis à jour !`);
     } else {
       await DataManager.addCat(cat);
+      // Ajout automatique à l'historique
+      try {
+        const existing = await sb.query('history_names', { filter: `name=eq.${encodeURIComponent(cat.name)}` });
+        if (!existing.length) {
+          await sb.insert('history_names', { id: 'hist-' + Date.now(), name: cat.name });
+        }
+      } catch(he) { /* silencieux si table pas encore créée */ }
       showToast(`✅ ${cat.name} ajouté avec succès !`);
     }
     closeModal('catModal');
