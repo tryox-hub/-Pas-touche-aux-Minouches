@@ -56,6 +56,9 @@
       <button class="admin-nav-item" onclick="showSection('history')" id="navHistory">
         <span class="nav-icon">📜</span> Historique
       </button>
+      <button class="admin-nav-item" onclick="showSection('news')" id="navNews">
+        <span class="nav-icon">📰</span> Actualités
+      </button>
       <button class="admin-nav-item" onclick="showSection('settings')" id="navSettings">
         <span class="nav-icon">⚙️</span> Paramètres
       </button>
@@ -142,6 +145,17 @@
               <tbody id="appsTableBody"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ======================== NEWS SECTION ======================== -->
+      <div id="sectionNews" style="display:none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📰 Actualités</h3>
+            <button class="btn-primary btn-sm" onclick="openNewsModal()">➕ Nouvelle actualité</button>
+          </div>
+          <div id="newsList"></div>
         </div>
       </div>
 
@@ -394,18 +408,123 @@ if (DataManager.isAdmin()) {
 // ---- SECTIONS ----
 function showSection(name) {
   document.querySelector('.admin-layout').classList.remove('sidebar-open');
-  ['cats','applications','messages','stats','settings','history'].forEach(s => {
+  ['cats','applications','messages','stats','settings','history','news'].forEach(s => {
     const sec = document.getElementById('section' + s.charAt(0).toUpperCase() + s.slice(1));
     const nav = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
     if (sec) sec.style.display = s === name ? 'block' : 'none';
     if (nav) nav.classList.toggle('active', s === name);
   });
-  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres', history: '📜 Historique des minouches' };
+  const titles = { cats: '🐾 Chats & Chatons', applications: '📋 Demandes d\'adoption', messages: '💬 Messages contact', stats: '📊 Statistiques', settings: '⚙️ Paramètres', history: '📜 Historique des minouches', news: '📰 Actualités' };
   document.getElementById('adminTitle').textContent = titles[name] || '';
   if (name === 'applications') renderAppsTable();
   if (name === 'messages') renderMsgsTable();
   if (name === 'stats') loadStatsForm();
   if (name === 'history') renderHistory();
+  if (name === 'news') renderNewsList();
+}
+
+// ---- NEWS ----
+let _newsList = [];
+
+async function renderNewsList() {
+  const container = document.getElementById('newsList');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--brown-soft);">⏳ Chargement...</div>';
+  try {
+    const rows = await sb.query('news', { order: 'date.desc' });
+    _newsList = rows;
+    if (!rows.length) {
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--brown-soft);">Aucune actualité pour le moment 📰</div>';
+      return;
+    }
+    container.innerHTML = rows.map(n => `
+      <div style="border:1.5px solid var(--cream-dark);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;display:flex;gap:1rem;align-items:flex-start;">
+        ${n.img ? `<img src="${n.img}" style="width:80px;height:80px;object-fit:cover;border-radius:0.5rem;flex-shrink:0;"/>` : ''}
+        <div style="flex:1;">
+          <div style="font-weight:700;color:var(--brown);font-size:1.05rem;">${n.title}</div>
+          <div style="font-size:0.8rem;color:var(--brown-soft);margin:0.25rem 0 0.5rem;">${new Date(n.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div>
+          <div style="color:var(--brown-soft);font-size:0.9rem;white-space:pre-wrap;">${n.content.length > 150 ? n.content.slice(0,150)+'...' : n.content}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;flex-shrink:0;">
+          <button class="btn-edit" onclick="openNewsModal('${n.id}')">✏️</button>
+          <button class="btn-del" onclick="deleteNews('${n.id}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="color:#e74c3c;padding:1rem;">❌ Erreur — table news manquante dans Supabase ?</div>';
+  }
+}
+
+function openNewsModal(id) {
+  document.getElementById('newsId').value = '';
+  document.getElementById('newsTitle').value = '';
+  document.getElementById('newsContent').value = '';
+  document.getElementById('newsImg').value = '';
+  document.getElementById('newsUploadStatus').textContent = '';
+  document.getElementById('newsModalTitle').textContent = '📰 Nouvelle actualité';
+  if (id) {
+    const n = _newsList.find(x => x.id === id);
+    if (n) {
+      document.getElementById('newsId').value = n.id;
+      document.getElementById('newsTitle').value = n.title;
+      document.getElementById('newsContent').value = n.content;
+      document.getElementById('newsImg').value = n.img || '';
+      document.getElementById('newsModalTitle').textContent = '✏️ Modifier l\'actualité';
+    }
+  }
+  document.getElementById('newsModal').style.display = 'flex';
+}
+
+async function saveNews(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type="submit"]');
+  btn.textContent = '⏳...'; btn.disabled = true;
+  const id = document.getElementById('newsId').value;
+  const data = {
+    title:   document.getElementById('newsTitle').value.trim(),
+    content: document.getElementById('newsContent').value.trim(),
+    img:     document.getElementById('newsImg').value.trim() || null,
+    date:    new Date().toISOString()
+  };
+  try {
+    if (id) {
+      await sb.update('news', data, `id=eq.${id}`);
+      showToast('✅ Actualité mise à jour !');
+    } else {
+      data.id = 'news-' + Date.now();
+      await sb.insert('news', data);
+      showToast('✅ Actualité publiée !');
+    }
+    closeModal('newsModal');
+    await renderNewsList();
+  } catch(err) {
+    showToast('❌ Erreur : ' + err.message, 'error');
+  } finally {
+    btn.textContent = '💾 Sauvegarder'; btn.disabled = false;
+  }
+}
+
+async function deleteNews(id) {
+  if (!confirm('Supprimer cette actualité ?')) return;
+  await sb.remove('news', `id=eq.${id}`);
+  showToast('🗑️ Actualité supprimée', 'info');
+  await renderNewsList();
+}
+
+async function handleNewsImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('newsUploadStatus');
+  status.textContent = '⏳ Upload...';
+  try {
+    const url = await sb.uploadImage(file);
+    document.getElementById('newsImg').value = url;
+    status.textContent = '✅ Photo uploadée !';
+    status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = '#e74c3c';
+  }
 }
 
 // ---- HISTORY ----
@@ -847,5 +966,35 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
 });
 </script>
+<!-- MODAL NEWS -->
+<div id="newsModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('newsModal')">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 id="newsModalTitle">📰 Nouvelle actualité</h3>
+      <button class="modal-close" onclick="closeModal('newsModal')">✕</button>
+    </div>
+    <form id="newsForm" onsubmit="saveNews(event)">
+      <input type="hidden" id="newsId"/>
+      <div class="form-group"><label>Titre *</label><input type="text" class="form-control" id="newsTitle" required placeholder="Ex : Nouvelle portée de chatons !"/></div>
+      <div class="form-group">
+        <label>Contenu *</label>
+        <textarea class="form-control" id="newsContent" rows="5" required placeholder="Décrivez votre actualité..."></textarea>
+      </div>
+      <div class="form-group"><label>Image (URL ou upload)</label>
+        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
+          <label for="newsImgFile" style="cursor:pointer;background:var(--coral);color:white;padding:0.4rem 0.9rem;border-radius:0.75rem;font-size:0.85rem;font-weight:600;">📁 Choisir</label>
+          <input type="file" id="newsImgFile" accept="image/*" style="display:none;" onchange="handleNewsImgUpload(this)"/>
+          <span id="newsUploadStatus" style="font-size:0.8rem;color:var(--brown-soft);"></span>
+        </div>
+        <input type="url" class="form-control" id="newsImg" placeholder="https://... (optionnel)"/>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem;">
+        <button type="button" class="btn-outline" onclick="closeModal('newsModal')">Annuler</button>
+        <button type="submit" class="btn-primary">💾 Sauvegarder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 </body>
 </html>
