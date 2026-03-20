@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Actualités — Pas touche aux Minouches</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="nav-title">Pas touche aux</span><span class="nav-title logo-bold">Minouches</span></div></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="chats.html">Nos Chats</a></li>
+      <li><a href="chatons.html">Chatons</a></li>
+      <li><a href="adoption.html">Adopter</a></li>
+      <li><a href="actualites.html" class="active">Actualités</a></li>
+      <li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="don.html" class="btn-primary">💛 Faire un don</a>
+    <button class="nav-burger" id="navBurger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div style="padding-top:80px;"></div>
+
+<!-- Hero -->
+<div style="background:var(--cream-dark);padding:3rem 2rem;text-align:center;">
+  <div style="font-size:3rem;margin-bottom:0.75rem;">📰</div>
+  <h1 style="font-family:var(--font-display);color:var(--brown);font-size:2.2rem;margin-bottom:0.5rem;">Nos actualités</h1>
+  <p style="color:var(--brown-soft);max-width:500px;margin:0 auto;">Suivez la vie de l'association, les sauvetages, les adoptions et toutes nos nouvelles !</p>
+</div>
+
+<!-- Décos -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;">
+  <span style="position:absolute;top:20%;left:2%;font-size:2rem;opacity:0.07;">🐾</span>
+  <span style="position:absolute;top:50%;right:3%;font-size:2rem;opacity:0.07;">❤️</span>
+  <span style="position:absolute;bottom:15%;left:5%;font-size:2rem;opacity:0.07;">⭐</span>
+</div>
+
+<!-- Articles -->
+<div style="max-width:800px;margin:3rem auto;padding:0 1.5rem;" id="newsContainer">
+  <div style="text-align:center;padding:3rem;color:var(--brown-soft);">
+    <div style="font-size:3rem;margin-bottom:1rem;">⏳</div>
+    <p>Chargement des actualités...</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div><div class="footer-sub">Association loi 1901</div></div></div>
+    <div class="footer-links">
+      <div class="footer-col"><h4>Navigation</h4><a href="chats.html">Chats</a><a href="chatons.html">Chatons</a><a href="adoption.html">Adopter</a><a href="don.html">Donner</a></div>
+      <div class="footer-col"><h4>Association</h4><a href="actualites.html">Actualités</a><a href="a-propos.html">À propos</a><a href="contact.html">Contact</a><a href="mentions-legales.html">Mentions légales</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span> · <a href="mentions-legales.html" style="opacity:0.6;font-size:0.85rem;color:var(--cream-dark);">Mentions légales</a></div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+async function loadNews() {
+  const container = document.getElementById('newsContainer');
+  try {
+    const rows = await sb.query('news', { order: 'date.desc' });
+    if (!rows.length) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:4rem 2rem;color:var(--brown-soft);">
+          <div style="font-size:4rem;margin-bottom:1rem;">📭</div>
+          <h2 style="color:var(--brown);">Aucune actualité pour le moment</h2>
+          <p>Revenez bientôt, nous avons toujours des nouvelles à partager !</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = rows.map(n => `
+      <article style="background:white;border-radius:var(--radius-lg);box-shadow:0 2px 12px rgba(92,64,51,0.08);margin-bottom:2rem;overflow:hidden;border:1.5px solid var(--cream-dark);">
+        ${n.img ? `<img src="${n.img}" alt="${n.title}" style="width:100%;height:220px;object-fit:cover;"/>` : ''}
+        <div style="padding:1.5rem 2rem 2rem;">
+          <div style="font-size:0.8rem;color:var(--coral);font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;">
+            📅 ${new Date(n.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}
+          </div>
+          <h2 style="font-family:var(--font-display);color:var(--brown);font-size:1.5rem;margin-bottom:1rem;">${n.title}</h2>
+          <div style="color:var(--brown-soft);line-height:1.8;white-space:pre-wrap;">${n.content}</div>
+        </div>
+      </article>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--brown-soft);">Impossible de charger les actualités.</div>`;
+  }
+}
+loadNews();
+</script>
+</body>
+</html>
