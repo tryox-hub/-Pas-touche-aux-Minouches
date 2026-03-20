@@ -13,7 +13,8 @@
     <a href="index.html" class="nav-logo"><span class="logo-icon">🐱</span><div><span class="logo-title">Pas touche aux</span><span class="logo-title logo-bold">Minouches</span></div></a>
     <ul class="nav-links" id="navLinks">
       <li><a href="chats.html">Nos Chats</a></li><li><a href="chatons.html">Chatons</a></li>
-      <li><a href="adoption.html">Adopter</a></li><li><a href="a-propos.html">À Propos</a></li>
+      <li><a href="adoption.html">Adopter</a></li><li><a href="actualites.html">Actualités</a></li>
+      <li><a href="a-propos.html">À Propos</a></li>
       <li><a href="contact.html" class="active">Contact</a></li>
     </ul>
     <a href="don.html" class="btn-primary">💛 Faire un don</a>
@@ -29,7 +30,7 @@
     <div class="contact-info-item">
       <div class="ci-icon">✉️</div>
       <p>Email</p>
-      <strong><a href="mailto:contact@pastoucheauxminouches.fr" style="color:var(--coral);">contact@pastoucheauxminouches.fr</a></strong>
+      <strong><a href="/cdn-cgi/l/email-protection#a6c5c9c8d2c7c5d2e6d6c7d5d2c9d3c5cec3c7d3decbcfc8c9d3c5cec3d588c0d4" style="color:var(--coral);"><span class="__cf_email__" data-cfemail="23404c4d5742405763534250574c56404b4642565b4e4a4d4c56404b46500d4551">[email&#160;protected]</span></a></strong>
     </div>
     <div class="contact-info-item">
       <div class="ci-icon">📘</div>
@@ -73,6 +74,9 @@
         <label>Message *</label>
         <textarea class="form-control" name="message" required rows="5" placeholder="Votre message..."></textarea>
       </div>
+      <div style="background:var(--cream-dark);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--brown-soft);border-left:3px solid var(--coral);">
+        🔒 <strong>Vos données personnelles</strong> (nom, email) sont utilisées uniquement pour répondre à votre message. Voir nos <a href="mentions-legales.html" style="color:var(--coral);text-decoration:underline;">Mentions légales</a>.
+      </div>
       <div style="text-align:center;margin-top:1rem;">
         <button type="submit" class="btn-primary btn-large">Envoyer le message 💌</button>
       </div>
@@ -83,60 +87,18 @@
   <div style="background:#fff3e0;border:2px solid var(--amber);border-radius:var(--radius-lg);padding:1.5rem 2rem;margin-top:1.5rem;">
     <h3 style="color:var(--amber);margin-bottom:0.5rem;">⚠️ Vous avez trouvé un chat en détresse ?</h3>
     <p style="color:var(--brown-soft);margin-bottom:1rem;">Contactez-nous immédiatement par email ou via nos réseaux sociaux. En cas d'urgence vétérinaire, contactez directement une clinique vétérinaire.</p>
-    <a href="mailto:urgence@pastoucheauxminouches.fr" class="btn-primary" style="background:var(--amber);">📧 Contacter l'équipe urgences</a>
+    <a href="/cdn-cgi/l/email-protection#bcc9cedbd9d2dfd9fcccddcfc8d3c9dfd4d9ddc9c4d1d5d2d3c9dfd4d9cf92dace" class="btn-primary" style="background:var(--amber);">📧 Contacter l'équipe urgences</a>
   </div>
 </div>
 
-<!--FOOTER-->
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-brand">
-      <span class="logo-icon">🐱</span>
-      <div>
-        <div class="footer-name">Pas touche aux Minouches</div>
-        <div class="footer-sub">Association loi 1901 • SIRET: XXXXXXXXX</div>
-      </div>
-    </div>
+    <div class="footer-brand"><span class="logo-icon">🐱</span><div><div class="footer-name">Pas touche aux Minouches</div></div></div>
     <div class="footer-links">
-      <div class="footer-col">
-        <h4>Nos Minouches</h4>
-        <a href="chats.html">Chats adultes</a>
-        <a href="chatons.html">Chatons</a>
-        <a href="adoption.html">Adopter</a>
-      </div>
-      <div class="footer-col">
-        <h4>Association</h4>
-        <a href="a-propos.html">À propos</a>
-        <a href="don.html">Faire un don</a>
-        <a href="contact.html">Contact</a>
-      </div>
-      <div class="footer-col">
-        <h4>Suivez-nous</h4>
-        <a href="#" target="_blank">📘 Facebook</a>
-        <a href="#" target="_blank">📸 Instagram</a>
-        <a href="mailto:contact@pastoucheauxminouches.fr">✉️ Email</a>
-      </div>
+      <div class="footer-col"><h4>Navigation</h4><a href="chats.html">Chats</a><a href="don.html">Donner</a><a href="adoption.html">Adopter</a></div>
     </div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2024 Pas touche aux Minouches</span>
-    <span>|</span>
-    <a href="mentions-legales.html">Mentions légales</a>
-    <span>|</span>
-    <a href="confidentialite.html">Confidentialité</a>
-  </div>
+  <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span> · <a href="mentions-legales.html" style="opacity:0.6;font-size:0.85rem;color:var(--cream-dark);">Mentions légales</a></div>
 </footer>
 
-
-<script src="assets/js/data.js"></script>
-<script src="assets/js/main.js"></script>
-<script>
-function handleContact(e) {
-  e.preventDefault();
-  document.getElementById('contactForm').style.display = 'none';
-  document.getElementById('successContact').style.display = 'block';
-  window.scrollTo({ top: 200, behavior: 'smooth' });
-}
-</script>
-</body>
-</html>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/data.js"></
