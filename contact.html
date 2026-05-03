@@ -125,4 +125,42 @@
   <div class="footer-bottom"><span>© 2024 Pas touche aux Minouches</span> · <a href="mentions-legales.html" style="opacity:0.6;font-size:0.85rem;color:var(--cream-dark);">Mentions légales</a></div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/data.js"></
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+async function handleContact(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('[type="submit"]');
+  btn.textContent = '⏳ Envoi...'; btn.disabled = true;
+
+  const form = e.target;
+  const msg = {
+    id:         'msg-' + Date.now(),
+    first_name: form.querySelector('[name="firstName"]')?.value.trim() || '',
+    last_name:  form.querySelector('[name="lastName"]')?.value.trim() || '',
+    email:      form.querySelector('[name="email"]')?.value.trim() || '',
+    subject:    form.querySelector('[name="subject"]')?.value.trim() || '',
+    message:    form.querySelector('[name="message"]')?.value.trim() || '',
+    status:     'unread',
+    date:       new Date().toISOString()
+  };
+
+  try {
+    await sb.insert('messages', msg);
+    e.target.reset();
+    btn.textContent = '✅ Message envoyé !';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = 'Envoyer le message 💌';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  } catch(err) {
+    btn.textContent = '❌ Erreur, réessaie';
+    btn.disabled = false;
+    console.error(err);
+  }
+}
+</script>
+</body>
+</html>
